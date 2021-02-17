@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import './landing-page.css'
+import './landing-page.css';
+import { Link } from 'react-router-dom';
+import splitwiselogo from '../../images/splitwise-logo.png'
 import { BsHouseDoorFill, BsFillHeartFill } from "react-icons/bs";
 import { FaRegSnowflake, FaPlaneDeparture } from "react-icons/fa";
 import Typical from 'react-typical'
@@ -13,12 +15,16 @@ export class landingPage extends Component {
                     <div className="top__component__first">
                     </div>
                     <div className="top__component__second">
+                        <img src={splitwiselogo} width="80" height="60" alt="" />
                         <div className="top__component__text">Splitwise</div>
                     </div>
                     <div className="top__component__third">
-                        <button className="login-button">Login</button>
-                        <button className="sign-button">Sign Up</button>
-
+                        <Link to="/login">
+                            <button type="button" style={{ "height": "50px", "width": "100px", "margin-left": "-100px", "margin-top": "20px" }} class="btn btn-outline-success">Login</button>
+                        </Link>
+                        <Link to="/signup">
+                            <button type="button" style={{ "height": "50px", "width": "100px", "margin-left": "10px", "margin-top": "20px" }} class="btn btn-success">Signup</button>
+                        </Link>
                     </div>
                 </div>
                 <div className="second__component">
@@ -34,7 +40,7 @@ export class landingPage extends Component {
                             ]}
                         /> */}
                         </div>
-                        <div> 
+                        <div className="Icons">
                             <ul class="second__Icons">
                                 <li><FaPlaneDeparture size={40} color="green" /></li>
                                 <li><FaRegSnowflake size={40} color="grey" /></li>
@@ -43,15 +49,17 @@ export class landingPage extends Component {
                             </ul>
                         </div>
                         <div className="second__smallText">Keep track of your shared expenses and balances with trips,groups and families. </div>
-                        <button className="signup-button">Sign Up</button>
+
+                        <Link to="/signup">
+                            <button type="button" style={{ "height": "50px", "width": "170px", "margin-left": "200px", "margin-top": "20px" }} class="btn btn-success btn-lg">Sign-Up</button>
+                        </Link>
 
                     </div>
                     <div className="second__second__part">
 
-                        <span><BsHouseDoorFill size={600} color="purple" /></span>
+                        <span><FaRegSnowflake size={600} color="lightgrey" /></span>
                     </div>
                 </div>
-                <div className="third__component"></div>
             </div>
         )
     }
