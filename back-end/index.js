@@ -2,6 +2,7 @@ const PORT = 3003;
 var cors = require( 'cors' );
 var express = require( 'express' );
 var session = require( "express-session" );
+var user = require( './user/routes')
 var bodyParser = require( 'body-parser' );
 var mysql = require( 'mysql');
 var cookieParser = require( "cookie-parser" );
@@ -18,7 +19,7 @@ app.use( bodyParser.json() );
 app.use( bodyParser.urlencoded( { extended: false } ) );
 app.use( cookieParser() );
 app.use( express.static( 'public' ) )
-app.use( cors( { origin: "http://localhost:3004", credentials: true } ) );
+app.use( cors( { origin: "http://localhost:3002", credentials: true } ) );
 app.use(
     session( {
         key: 'user_sid',
@@ -49,6 +50,11 @@ app.get('/createdb',(req,res) => {
 app.listen( PORT, () => {
     console.log( "Server listening on port: ", PORT );
 } );
+
+
+app.use( '/users', user );
+
+
 app.get( '/', ( req, res ) => {
     res.send( 'Welcome to Splitwise - Easiest way to split expenses' );
 } );
