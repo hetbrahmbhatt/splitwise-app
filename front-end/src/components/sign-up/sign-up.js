@@ -12,7 +12,8 @@ export class SignUp extends Component {
             email: '',
             password: '',
             error: false,
-            errorMessage: ""
+            errorMessage: "",
+            emailError: false
         }
     }
 
@@ -24,11 +25,12 @@ export class SignUp extends Component {
     }
 
     handleEmailChange = inp => {
-        console.log( inp.target.name, inp.target.value );
+        console.log(inp.target.name, inp.target.value);
         if (/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(inp.target.value)) {
             this.setState({
                 error: false,
-                [inp.target.name]: inp.target.value
+                [inp.target.name]: inp.target.value,
+                errorMessage: " "
             })
         } else {
             this.setState({
@@ -50,32 +52,36 @@ export class SignUp extends Component {
         } else {
             this.setState({
                 error: false,
-                [inp.target.name]: inp.target.value
+                [inp.target.name]: inp.target.value,
+                errorMessage: " "
+
             })
         }
     }
-
-
     //handle submit
-    handleSubmit = sub => {
-        sub.preventDefault();
-
-        console.log(this.state);
-
+    handleSubmit = event => {
+        event.preventDefault();
+        axios
+            .post(BACKEND_URL + '/users/signup', this.state)
+            .then((response) => {
+                console.log(response);
+                if (response.status === 200) {
+                    window.location.assign('/login')
+                }
+            })
+            .catch((err) => {
+                this.setState({
+                    errorMessage: err.response.data,
+                    emailError: true
+                })
+            });
     };
-
-    renderError = () => {
-        if (this.state.error) {
-            return (
-                <div>
-                    <h5>"User with this email already exist"</h5>
-                </div>
-            )
-        }
-    }
-
     render() {
         let renderError = null
+        let emailError = null;
+        if (this.state.emailError) {
+            emailError = <div style={{ 'color': 'red' }}>{this.state.errorMessage}</div>
+        }
         if (this.state.error) {
             renderError = <div style={{ 'color': 'red' }}>{this.state.errorMessage}</div>
         }
@@ -85,7 +91,7 @@ export class SignUp extends Component {
                     <div className="col-5" style={{ "paddingLeft": "10%" }}>
                         <div className='row' style={{ "height": "90%" }}>
                             <div className="col-12">
-                            <img src={splitwiselogo} width="80" height="60" alt="" />
+                                <img src={splitwiselogo} width="80" height="60" alt="" />
                                 <h4 >Please Introduce Yourself</h4>
                                 <form onSubmit={this.handleSubmit} style={{ "margin": "10px" }} id="Signup">
                                     <div className="form-group">
@@ -95,7 +101,7 @@ export class SignUp extends Component {
                                     <div className="form-group">
                                         <input type="text" className="form-control" name="email" required
                                             placeholder="Enter Email" onChange={this.handleEmailChange} />
-
+                                        {emailError}
                                     </div>
                                     <div className="form-group">
                                         <input type="password" className="form-control" name="password" required

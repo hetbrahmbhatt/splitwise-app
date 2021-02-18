@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router';
 import './landing-page.css';
+import cookie from "react-cookies";
 import { Link } from 'react-router-dom';
 import splitwiselogo from '../../images/splitwise-logo.png'
 import { BsHouseDoorFill, BsFillHeartFill } from "react-icons/bs";
 import { FaRegSnowflake, FaPlaneDeparture } from "react-icons/fa";
-import Typical from 'react-typical'
-// TODO: Add image icon
 export class landingPage extends Component {
     render() {
+        if (cookie.load('auth')) {
+            return <Redirect to='/users/dashboard' />
+        }
         return (
 
             <div className="main">
@@ -31,14 +34,6 @@ export class landingPage extends Component {
                     <div className="second__first__part">
                         <div className="second__text">
                             Less stress when sharing expenses{' '} with anyone.
-                        {/* <Typical loop={Infinity}
-                            wrapper="b"
-                            steps={[
-                                'with anyone', 1000,
-                                '  on trips', 1000,
-                                'with housemates', 1000
-                            ]}
-                        /> */}
                         </div>
                         <div className="Icons">
                             <ul class="second__Icons">
