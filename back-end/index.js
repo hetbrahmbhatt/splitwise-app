@@ -1,4 +1,4 @@
-const PORT = 4001;
+const PORT = 4006;
 var cors = require( 'cors' );
 var express = require( 'express' );
 var session = require( "express-session" );
@@ -6,6 +6,7 @@ var user = require( './user/routes')
 var bodyParser = require( 'body-parser' );
 var mysql = require( 'mysql');
 var cookieParser = require( "cookie-parser" );
+const fileUpload = require('express-fileupload');
 const app = express();
 //Session management
 const db = mysql.createConnection({
@@ -15,11 +16,12 @@ const db = mysql.createConnection({
     database : 'test',
     port : 3306
 });
+app.use(fileUpload());
 app.use( bodyParser.json() );
 app.use( bodyParser.urlencoded( { extended: false } ) );
 app.use( cookieParser() );
 app.use( express.static( 'public' ) )
-app.use( cors( { origin: "http://localhost:3004", credentials: true } ) );
+app.use( cors( { origin: "http://localhost:3002", credentials: true } ) );
 app.use(
     session( {
         key: 'user_sid',

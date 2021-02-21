@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router';
+import { toast } from "react-toastify";
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import cookie from "react-cookies";
 import BACKEND_URL from '../../config/config'
 import splitwiselogo from '../../images/splitwise-logo.png'
 
-export class Login extends Component {
+export class login extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -56,55 +56,62 @@ export class Login extends Component {
             })
         }
     }
-
-
     //handle submit
-    handleSubmit = sub => {
-        sub.preventDefault();
-        console.log(BACKEND_URL)
-        axios
-            .post(BACKEND_URL + '/users'+'/login', this.state)
-            .then((response) => {
-                if (response.status === 200) {
-                    this.setState({
-                        error: false
-                    })
-                    cookie.save("auth", true, {
-                        path: '/',
-                        httpOnly: false,
-                        maxAge: 90000
-                    })
-                    cookie.save("id", response.data.id, {
-                        path: '/',
-                        httpOnly: false,
-                        maxAge: 90000
-                    })
-                    cookie.save("name", response.data.name, {
-                        path: '/',
-                        httpOnly: false,
-                        maxAge: 90000
-                    })
-                    cookie.save("email", response.data.email, {
-                        path: '/',
-                        httpOnly: false,
-                        maxAge: 90000
-                    })
-                    cookie.save("type", this.state.type, {
-                        path: '/',
-                        httpOnly: false,
-                        maxAge: 90000
-                    })
-                    window.location.assign('/users/dashboard');
-                }
-            })
-            .catch((err) => {
-                this.setState({
-                    error: true,
-                    errorMessage: "Invalid Credentials"
-                })
+    handleSubmit = e => {
+        e.preventDefault();
+        if (!this.state.error) {
+            axios
+                .post(BACKEND_URL + '/users/login', this.state)
+                .then((response) => {
+                    console.log(response);
+                    if (response.status === 200) {
+                        this.setState({
+                            error: false
+                        })
+                        cookie.save("auth", true, {
+                            path: '/',
+                            httpOnly: false,
+                            maxAge: 90000
+                        })
+                        cookie.save("id", response.data.id, {
+                            path: '/',
+                            httpOnly: false,
+                            maxAge: 90000
+                        })
+                        cookie.save("name", response.data.name, {
+                            path: '/',
+                            httpOnly: false,
+                            maxAge: 90000
+                        })
+                        cookie.save("email", response.data.email, {
+                            path: '/',
+                            httpOnly: false,
+                            maxAge: 90000
+                        })
+                        cookie.save("defaultcurrency", " ", {
+                            path: '/',
+                            httpOnly: false,
+                            maxAge: 90000
+                        })
+                        cookie.save("timezone", " ", {
+                            path: '/',
+                            httpOnly: false,
+                            maxAge: 90000
+                        })
 
-            });
-    };
+                        toast.error("Successfully logged in")
+                        window.location.assign('/users/dashboard');
+                    }
+                })
+                .catch((err) => {
+                    this.setState({
+                        error: true,
+                        errorMessage: "Invalid Credentials"
+                    })
+
+                });
+        };
+    }
 
 
     render() {
@@ -113,7 +120,7 @@ export class Login extends Component {
             renderError = <div style={{ 'color': 'red' }}>{this.state.errorMessage}</div>
         }
         return (
-            <div style={{"margin-left" : "30%","margin-top" : "-40px"}}>
+            <div style={{ "marginLeft": "30%", "margin-top": "-40px" }}>
 
                 <div className="row" style={{ height: "100vh", "padding": "10%" }}>
 
@@ -126,7 +133,7 @@ export class Login extends Component {
 
                                 {/* <h4 style={{ "margin": "10px", 'color': 'green' }}>Login to Splitwise</h4> */}
                                 <form onSubmit={this.handleSubmit} id="Login">
-                                <h4 style={{ "margin": "10px", 'color': 'green' }}>Welcome to Splitwise</h4>
+                                    <h4 style={{ "margin": "10px", 'color': 'green' }}>Welcome to Splitwise</h4>
                                     <div className="row" style={{ "padding": "5%" }}>
                                         <img src={splitwiselogo} style={{ "paddingLeft": "0%" }} width="100%" height="100%" alt="" />
                                     </div>
@@ -161,4 +168,4 @@ export class Login extends Component {
     }
 }
 
-export default Login
+export default login

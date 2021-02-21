@@ -14,7 +14,7 @@ export class landingPage extends Component {
         return (
 
             <div className="main">
-                <div className="top__component">
+                {/* <div className="top__component">
                     <div className="top__component__first">
                     </div>
                     <div className="top__component__second">
@@ -29,7 +29,7 @@ export class landingPage extends Component {
                             <button type="button" style={{ "height": "50px", "width": "100px", "margin-left": "10px", "margin-top": "20px" }} class="btn btn-success">Signup</button>
                         </Link>
                     </div>
-                </div>
+                </div> */}
                 <div className="second__component">
                     <div className="second__first__part">
                         <div className="second__text">

@@ -3,8 +3,9 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import BACKEND_URL from '../../config/config';
 import splitwiselogo from '../../images/splitwise-logo.png'
+import cookie from "react-cookies";
 
-export class SignUp extends Component {
+export class signup extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -59,23 +60,53 @@ export class SignUp extends Component {
         }
     }
     //handle submit
-    handleSubmit = event => {
-        event.preventDefault();
-        axios
-            .post(BACKEND_URL + '/users/signup', this.state)
-            .then((response) => {
-                console.log(response);
-                if (response.status === 200) {
-                    window.location.assign('/login')
-                }
-            })
-            .catch((err) => {
-                this.setState({
-                    errorMessage: err.response.data,
-                    emailError: true
+    handleSubmit = e => {
+        if (!this.state.error) {
+            e.preventDefault();
+            axios
+                .post(BACKEND_URL + '/users/signup', this.state)
+                .then((response) => {
+                    console.log(response);
+                    if (response.status === 200) {
+                        this.setState({
+                            error: false
+                        })
+                        this.setState({
+                            emailError: true
+                        })
+                        cookie.save("auth", true, {
+                            path: '/',
+                            httpOnly: false,
+                            maxAge: 90000
+                        })
+                        cookie.save("id", response.data.id, {
+                            path: '/',
+                            httpOnly: false,
+                            maxAge: 90000
+                        })
+                        cookie.save("name", response.data.name, {
+                            path: '/',
+                            httpOnly: false,
+                            maxAge: 90000
+                        })
+                        cookie.save("email", response.data.email, {
+                            path: '/',
+                            httpOnly: false,
+                            maxAge: 90000
+                        })
+                        window.location.assign('/users/dashboard');
+                    }
+                    console.log(response.status);
                 })
-            });
-    };
+                .catch((err) => {
+                    console.log("Error");
+                    this.setState({
+                        errorMessage: err.response.data,
+                        emailError: true
+                    })
+                });
+        };
+    }
     render() {
         let renderError = null
         let emailError = null;
@@ -125,4 +156,4 @@ export class SignUp extends Component {
     }
 }
 
-export default SignUp
+export default signup
