@@ -6,6 +6,7 @@ import login from './login/login'
 import logout from './login/logout';
 import Navbar from './landing-page/navbar';
 import Profile from './user/profile';
+import NewGroup from './groups/new-group';
 
 
 export class Routing extends Component {
@@ -14,10 +15,16 @@ export class Routing extends Component {
             <div>
                 <Route path='/' component={ Navbar } />
                 <Route exact path='/' component={landingPage} />
+
+                {/* User */}
                 <Route path='/signup' component={signup} />
                 <Route path='/login' component={login} />
                 <Route path='/logout' component={logout} />
                 <Route path='/profile' component={Profile} />
+
+                {/* Group */}
+                <Route path='/new-group' component={NewGroup} />
+
 
             </div>
         )

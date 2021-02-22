@@ -95,7 +95,7 @@ export class Profile extends Component {
                 
                                 } )
                             } ).catch( err => {
-                                toast.error("Erro in image upload")
+                                toast.error("Error in image upload")
                             } )
                         }
                         if (cookie.load('email') !== this.state.email) {
@@ -138,7 +138,7 @@ export class Profile extends Component {
                                 maxAge: 90000
                             })
                         }
-                        window.location.assign( "/users/dashboard" );
+                        window.location.assign( "/profile" );
                     }
 
                 }).catch(err => {
@@ -153,8 +153,7 @@ export class Profile extends Component {
     async componentDidMount() {
         try {
             const userID = cookie.load("id")
-            console.log(userID);
-            const response = await axios.get(BACKEND_URL + "/users/" + userID);
+            const response = await axios.get(BACKEND_URL + "/users/userbyid/" + userID);
             this.setState({
                 userID: response.data.userid,
                 name: response.data.name,
@@ -163,9 +162,18 @@ export class Profile extends Component {
                 phoneno: response.data.phoneno,
                 timezone: response.data.timezone,
                 language: response.data.language,
-                profileImagePath : BACKEND_URL + '/images/profilepics/' + cookie.load('id') + '/' + response.data.image
 
             })
+            if(response.data.image == null)
+            { 
+                this.setState({
+                    profileImagePath : BACKEND_URL + '/images/avatar.png'
+                })            }
+            else{
+                this.setState({
+                profileImagePath : BACKEND_URL + '/images/profilepics/' + cookie.load('id') + '/' + response.data.image
+            })
+            }
         }
         catch (err) {
             console.log(err)
@@ -174,6 +182,7 @@ export class Profile extends Component {
     }
 
     render() {
+        console.log(this.state);
         var redirectTo = null;
         var emailError = null;
         const currency = [
@@ -195,7 +204,6 @@ export class Profile extends Component {
             { value: 'ESP', label: 'Spanish' },
 
         ]
-        var name = this.state.name;
         if (!(cookie.load("auth"))) {
             redirectTo = <Redirect to="/" />
         }
@@ -218,7 +226,7 @@ export class Profile extends Component {
 
                             <div className="row"><p style={{ "margin-left": '20px' }}>Change your Avatar</p></div>
                             <div className="row">
-                                <input style={{ "marginLeft": '20px' }} type="file" name="profileImage" onChange={this.handleImageChange} />
+                                <input style={{ "marginLeft": '20px' }} accept="image/x-png,image/gif,image/jpeg" type="file" name="profileImage" onChange={this.handleImageChange} />
                             </div>
                         </div>
                         <div class="col-sm">

@@ -72,7 +72,7 @@ export class signup extends Component {
                             error: false
                         })
                         this.setState({
-                            emailError: true
+                            emailError: false
                         })
                         cookie.save("auth", true, {
                             path: '/',

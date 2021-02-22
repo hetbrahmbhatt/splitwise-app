@@ -5,6 +5,8 @@ var connection = require('../config/db-config').connection;
 var _ = require('lodash');
 var path = require('path');
 var fs = require('fs');
+
+
 //signup
 router.post('/signup', (req, res) => {
     var name = req.body.name;
@@ -16,7 +18,8 @@ router.post('/signup', (req, res) => {
         var values = [name, email, hash];
         connection.query(sql, values, (err, results, fields) => {
             if (err) {
-                if (err.code = "ER_DUP_ENTRY") {
+                // If duplicate entry, send the corresponding message
+                if (err.sqlMessage.includes("Duplicate entry")) {
                     res.status(400).send(' Duplicate entry for email')
                 }
                 res.status(500).end('Error');
@@ -24,10 +27,10 @@ router.post('/signup', (req, res) => {
             } else {
                 var sql = `select userID,name,email,password from users where email="${email}"`;
                 connection.query(sql, (err, results) => {
-                    if(err){
+                    if (err) {
                         console.log(err);
                     }
-                    else if(results.length >0){
+                    else if (results.length > 0) {
                         userdata = {
                             id: results[0].userID,
                             name: results[0].name,
@@ -36,7 +39,6 @@ router.post('/signup', (req, res) => {
                         req.session.user = email;
 
                     }
-                    console.log(results[0]);
                     req.session.user = email;
                     res.status(200).send(JSON.stringify(userdata));
                 });
@@ -80,7 +82,8 @@ router.post('/login', (req, res) => {
 
 });
 //get user about by id 
-router.get('/:id', (req, res) => {
+router.get('/userbyid/:id', (req, res) => {
+    console.log("Over here");
     var id = req.params.id;
 
     var sql = `select * from users where userID="${id}"`;
@@ -100,9 +103,49 @@ router.get('/:id', (req, res) => {
 
     });
 });
+//get all users
+router.get('/all', (req, res) => {
+    var sql = `select * from users`;
+    connection.query(sql, (err, results) => {
+        if (err) {
+            res.status(500).end(err);
+        } else {
+            res.status(200).send(JSON.stringify(results));
+        }
+
+    });
+});
+
+//get users based on search
+router.get('/searchbyname', (req, res) => {
+    var sql = `select userID,name from users where name LIKE '${req.query.name_like}%'`;
+    connection.query(sql, (err, results) => {
+        if (err) {
+            res.status(500).end(err);
+        } else {
+            console.log("object");
+            res.status(200).send(JSON.stringify(results));
+        }
+
+    });
+});
+router.get('/searchbyemail', (req, res) => {
+    console.log("Here");
+    var sql = `select userID,email from users where email LIKE '${req.query.email_like}%'`;
+    connection.query(sql, (err, results) => {
+        if (err) {
+            res.status(500).end(err);
+        } else {
+            console.log("object");
+            res.status(200).send(JSON.stringify(results));
+        }
+
+    });
+});
 
 router.put('/editprofile', (req, res) => {
     var userID = req.body.userID;
+    console.log(userID);
     var name = req.body.name;
     var email = req.body.email;
     var defaultcurrency = req.body.defaultcurrency;
@@ -126,25 +169,25 @@ router.post('/uploadprofileimage', (req, res) => {
     if (req.files === null) {
         return res.status(400).send('No File Upload');
     }
-    console.log(req.files.profileImage.name);
+    console.log("object");
     const file = req.files.profileImage;
+    //Get the userID,file name from frontend
     var userID = req.files.profileImage.name.split(',')[1];
-    console.log(userID);
     const fileName = req.files.profileImage.name.split(',')[0];
-    var x = path.join(__dirname, '../public');
-    console.log(x);
-    console.log(__dirname);
-    const filePathwithoutfileName = x + '/images/profilepics/' + userID ;
-    const filePath = x + '/images/profilepics/' + userID + '/' + fileName;
-    if (!fs.existsSync(filePathwithoutfileName)){
+    var pathToImage = path.join(__dirname, '../public');
+    const filePathwithoutfileName = pathToImage + '/images/profilepics/' + userID;
+    const filePath = pathToImage + '/images/profilepics/' + userID + '/' + fileName;
+    //Create a file with that path
+    if (!fs.existsSync(filePathwithoutfileName)) {
         fs.mkdirSync(filePathwithoutfileName);
     }
-    console.log(filePath);
+    //Move the image to that path
     file.mv(filePath, err => {
         if (err) {
             return res.status(500).end(err);
         }
         else {
+            //Update the image path in the database
             var sql = `update users set image='${fileName}' where userID=${userID}`;
             connection.query(sql, (err, results) => {
                 if (err) {
@@ -154,6 +197,7 @@ router.post('/uploadprofileimage', (req, res) => {
             });
         }
     })
+    //Send the file name and file path to the client
     res.json({
         fileName: fileName,
         filePath: filePath

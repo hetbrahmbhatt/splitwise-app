@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import cookie from 'react-cookies';
 import splitwiselogo from '../../images/splitwise-logo.png'
-import buttonlogo from '../../images/button-logo.png'
 
 export class Navbar extends Component {
     render() {
@@ -25,8 +24,8 @@ export class Navbar extends Component {
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
 
                                 <a class="dropdown-item" href="/profile">Profile</a>
+                                <a class="dropdown-item" href="/new-group">Create a New Group</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#">Something else here</a>
                                 <a class="dropdown-item" href="/logout">
                                     Logout
                                 </a>
