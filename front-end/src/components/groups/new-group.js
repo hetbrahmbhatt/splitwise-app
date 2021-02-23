@@ -8,17 +8,18 @@ import AsyncSelect from 'react-select/async'
 import 'react-toastify/dist/ReactToastify.css';
 
 export class NewGroup extends Component {
-
-
     state = {
-        userID : cookie.load('id'),
+        userID: cookie.load('id'),
         groupName: "",
         selectedUsers: [],
         groupError: false,
         emailRadioButton: false,
         nameRadioButton: false,
-        error : false,
-        errorMessage : ""
+        error: false,
+        errorMessage: "",
+        profileImageUpdate: false,
+        updatedProfileImage: "",
+        profileImagePath: BACKEND_URL + '/images/avatar.png',
     }
     loadOptionsForName = async (inp, callback) => {
         const response = await axios.get(BACKEND_URL + "/users/searchbyname?name_like=" + inp);
@@ -35,20 +36,25 @@ export class NewGroup extends Component {
             value: i.userID
         })));
     }
-    
 
+    handleImageChange = e => {
+        this.setState({
+            updatedProfileImage: e.target.files[0],
+            profileImageUpdate: true
+        })
+    }
     handleRadioButtonChange = (event) => {
         console.log(event.target.value);
         if (event.target.value == "email") {
             this.setState({
                 emailRadioButton: true,
-                nameRadioButton : false
+                nameRadioButton: false
             })
         }
         else {
             this.setState({
                 nameRadioButton: true,
-                emailRadioButton : false
+                emailRadioButton: false
             })
         }
     }
@@ -68,11 +74,11 @@ export class NewGroup extends Component {
     handleSubmit = e => {
         e.preventDefault();
         console.log(this.state);
-        if(this.state.groupName == "" ){
+        if (this.state.groupName == "") {
             toast.error("Please enter group name");
             return;
         }
-        if(this.state.selectedUsers.length == 0 ){
+        if (this.state.selectedUsers.length == 0) {
             toast.error("Please enter group members");
             return;
         }
@@ -80,11 +86,35 @@ export class NewGroup extends Component {
             console.log(this.state);
             axios
                 .post(BACKEND_URL + "/groups/new", this.state).then(response => {
-                    console.log(response);
-                    toast.success(" Group created succesfully");
+                    if (response.status === 200) {
+                        console.log(response.data.groupID);
+                        const formData = new FormData();
+                        formData.append('profileImage', this.state.updatedProfileImage, this.state.updatedProfileImage.name + "," + response.data.groupID)
+                        const config = {
+                            headers: {
+                                'content-type': 'multipart/form-data'
+                            }
+                        }
+                        axios
+                            .post(BACKEND_URL + '/groups/uploadprofileimage', formData, config).then((response) => {
+                                this.setState({
+                                    profileImagePath: BACKEND_URL + '/images/grouppics/' + response.data.groupID + '/' + response.data.fileName
 
+                                })
+
+                                window.location.assign("/new-group");
+                                toast.success("Group Created Successfully");
+
+                            }).catch(err => {
+                                toast.error("Error in image upload")
+                            })
+                    }
                 }).catch(err => {
-                    toast.error(err.response.data);
+                    if (err.response == null) {
+
+                    }
+                    else
+                        toast.error(err.response.data);
                 })
         }
     }
@@ -124,8 +154,10 @@ export class NewGroup extends Component {
                 <div className="row" style={{ "height": "100vh" }}>
                     <div className="col-3"></div>
                     <div className="col-2">
-                        <img src={splitwiselogo} style={{ "paddingLeft": "0%" }} width="200px" height="200px" alt="" />
-
+                        <img src={this.state.profileImagePath} width="200" height="200" alt="" />
+                        <div className="row">
+                            <input style={{ "marginLeft": '20px' }} accept="image/x-png,image/gif,image/jpeg" type="file" name="profileImage" onChange={this.handleImageChange} />
+                        </div>
                     </div>
                     <div className="col-6">
                         <h5>Start a new group</h5>
