@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import splitwiselogo from '../../images/splitwise-logo.png'
 import axios from 'axios';
 import cookie from "react-cookies";
 import BACKEND_URL from '../../config/config'
@@ -87,6 +86,8 @@ export class NewGroup extends Component {
             axios
                 .post(BACKEND_URL + "/groups/new", this.state).then(response => {
                     if (response.status === 200) {
+                        toast.success("Group Created Successfully");
+                        window.location.assign("/users/dashboard");
                         console.log(response.data.groupID);
                         const formData = new FormData();
                         formData.append('profileImage', this.state.updatedProfileImage, this.state.updatedProfileImage.name + "," + response.data.groupID)
@@ -102,13 +103,11 @@ export class NewGroup extends Component {
 
                                 })
 
-                                window.location.assign("/new-group");
-                                toast.success("Group Created Successfully");
-
                             }).catch(err => {
                                 toast.error("Error in image upload")
                             })
                     }
+
                 }).catch(err => {
                     if (err.response == null) {
 

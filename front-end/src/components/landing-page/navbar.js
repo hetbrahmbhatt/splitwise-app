@@ -11,8 +11,8 @@ export class Navbar extends Component {
                 <div>
                     <nav class="navbar navbar-expand-lg navbar-dark" style={{ backgroundColor: '#20BF9F' }}>
                         {/* <a class="navbar-brand" href=""> */}
-                        <img style= {{"marginLeft":"100px"}} src={splitwiselogo} width="60" height="40" alt="" />
-                        <p style={{ "color" : "white","margin-top" :"5px","margin-left":"5px"}}>Splitwise</p>
+                        <img style={{ "marginLeft": "100px" }} src={splitwiselogo} width="60" height="40" alt="" />
+                        <p style={{ "color": "white", "marginTop": "5px", "marginLeft": "5px" }}>Splitwise</p>
                         {/* </a> */}
                         {/* <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                             <span class="navbar-toggler-icon"></span>
@@ -24,7 +24,9 @@ export class Navbar extends Component {
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
 
                                 <a class="dropdown-item" href="/profile">Profile</a>
+                                <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="/new-group">Create a New Group</a>
+                                <a class="dropdown-item" href="/all-group">Group Invitations</a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="/logout">
                                     Logout

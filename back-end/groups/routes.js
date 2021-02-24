@@ -3,6 +3,22 @@ var router = express.Router();
 var connection = require('../config/db-config').connection;
 var path = require('path');
 var fs = require('fs');
+
+router.get('/invitedgroups/:id', (req, res) => {
+    var userID = req.params.id;
+    console.log("here");
+    var sql = `SELECT master_group.groupid,master_group.name as groupName,master_group.image,u2.name as invitedBy FROM members inner join master_group ON members.ref_groupid = master_group.groupid inner join users ON members.ref_userid = users.userid inner join users u2 ON members.invitedby = u2.userid where members.ref_userid = ${userID} and status =1 and members.ref_userid != invitedby order by master_group.timestamp DESC`;
+    connection.query(sql, (err, results) => {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            console.log(JSON.stringify(results));
+            res.status(200).send(JSON.stringify(results));
+
+        }
+    });
+});
 router.get('/groupbyid/:id', (req, res) => {
     var id = req.params.id;
 
@@ -21,6 +37,46 @@ router.get('/groupbyid/:id', (req, res) => {
             res.status(200).send(JSON.stringify(data));
         }
 
+    });
+});
+router.get('/acceptedgroups/:id', (req, res) => {
+    var id = req.params.id;
+
+    var sql = `SELECT ref_groupid,name,image FROM splitwise.members as m inner join master_group as g on m.ref_groupid = g.groupid where m.status = 2 and m.ref_userID = ${id}`;
+    connection.query(sql, (err, results) => {
+        if (err) {
+            console.log(err);
+            res.end("Error:", err);
+        } else {
+            res.status(200).send(JSON.stringify(results));
+        }
+
+    });
+});
+router.put('/invite/', (req, res) => {
+
+    console.log(req.body);
+    var userID = Number(req.body.userID);
+    var groupID = req.body.groupID;
+    var type = req.body.type;
+    var sql = null;
+    if (type == "accept") {
+        sql = `update members set status=2 where ref_userID=${userID} and ref_groupID = ${groupID}`;
+    }
+    else {
+        sql = `update members set status=0 where ref_userID=${userID} and ref_groupID = ${groupID}`;
+
+    }
+    var values = [userID, groupID]
+
+    connection.query(sql, values, (err, results) => {
+        if (err) {
+            res.end("Error:", err);
+        }
+        else {
+            res.status(200).send(JSON.stringify(results));
+
+        }
     });
 });
 router.post('/uploadprofileimage', (req, res) => {
@@ -61,10 +117,15 @@ router.post('/uploadprofileimage', (req, res) => {
     })
 });
 router.post('/new', (req, res) => {
-    console.log(req.body);
-    console.log(req.body.groupName);
-    var sql = `insert into master_group(name) values(?);`
-    var values = [req.body.groupName];
+    //var timestamp = Date.now().toLocaleString()
+    let dateObject = new Date(new Date());
+    let date = dateObject.getDate().toString();
+    let month = (dateObject.getMonth() + 1).toString();
+    let year = dateObject.getFullYear().toString();
+    let time = dateObject.getHours().toString() + "-" + dateObject.getMinutes().toString() + "-" + dateObject.getSeconds().toString();
+    let timestamp = year + "-" + month + "-" + date + "-" + time;
+    var sql = `insert into master_group(name,timestamp) values(?,?);`
+    var values = [req.body.groupName, timestamp];
     connection.query(sql, values, (err, results, fields) => {
         if (err) {
             if (err.sqlMessage.includes("Duplicate entry")) {
@@ -92,13 +153,20 @@ router.post('/new', (req, res) => {
                 })
 
             }
+            var sql = `insert into members(ref_userID,ref_groupID,status,invitedBy) values(?,?,?,?);`
+            var values = [req.body.userID, results.insertId, status, req.body.userID];
+            //TODO: The id of the person appears twice, change that 
+
+            connection.query(sql, values, (err, results, fields) => {
+                if (err) {
+                    console.log(err);
+                    res.status(400).send("Error");
+                }
+            })
             var groupDetails = {
                 groupID: results.insertId
             }
             res.status(200).send(groupDetails);
-
-            // var sql = `select userID,name,email,password from users where email="${email}"`;
-
         }
     });
 })
