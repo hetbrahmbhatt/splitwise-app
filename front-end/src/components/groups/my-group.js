@@ -13,8 +13,15 @@ export class MyGroup extends Component {
         super(props)
         this.state = {
             groups: [],
-            acceptedGroups: []
+            acceptedGroups: [],
+            searchInput: ""
         }
+    }
+    handleSearch = (e) => {
+        console.log(e.target.name, e.target.value)
+        this.setState({
+            [e.target.name]: e.target.value
+        })
     }
     async componentDidMount() {
         const userID = cookie.load("id")
@@ -34,6 +41,7 @@ export class MyGroup extends Component {
             })
 
         })
+        console.log(this.state);
     }
     render() {
         var redirectVar = null;
@@ -49,14 +57,27 @@ export class MyGroup extends Component {
 
             )
         })
-        let groupAcceptedDetails = this.state.acceptedGroups.map((group) => {
-            return (
-                <div>
-                    <AcceptedGroup acceptedGroupData={group} />
-                </div>
+        let searchedGroups = this.state.acceptedGroups.filter((group) => {
+            if (group.groupName.toLowerCase().includes(this.state.searchInput.toLowerCase())) {
+                return group;
+            }
+            // console.log(group.groupName.toLowerCase().includes(this.state.searchInput.toLowerCase()))
+            // return group.groupName.toLowerCase().includes(this.state.searchInput.toLowerCase())
+        })
 
+        // let groupAcceptedDetails = searchedGroups.map(group => {
+        //     return (
+        //         <div>
+        //             <AcceptedGroup acceptedGroupData={group} />
+        //         </div>
+        //     )
+        // })
+        let groupAcceptedDetails = searchedGroups.map(group => {
+            return (
+                <AcceptedGroup acceptedGroupData={group} />
             )
         })
+
 
         return (
             <div>
@@ -75,9 +96,14 @@ export class MyGroup extends Component {
 
                         <h1 style={{ marginLeft: "50px", "marginBottom": "40px", "marginLeft": "150px" }}>Your Groups</h1>
                         <div className="col-6 m-4">
-                            <input type="text" style={{ "width": "400px", "marginLeft" : "10px" }} name="searchInput" onChange={this.handleSearch} placeholder="Search Accepted Groups"></input>
+                            <input type="text" style={{ "width": "400px", "marginLeft": "10px" }} name="searchInput" onChange={this.handleSearch} placeholder="Search Accepted Groups"></input>
                         </div>
-                        {groupAcceptedDetails}
+                        {searchedGroups.map(group => {
+                            // return console.log(group);
+                           return  <AcceptedGroup acceptedGroupData={group} />
+
+                        })}
+                        
                     </div>
                 </div>
             </div>
