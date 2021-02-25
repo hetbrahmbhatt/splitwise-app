@@ -42,7 +42,7 @@ router.get('/groupbyid/:id', (req, res) => {
 router.get('/acceptedgroups/:id', (req, res) => {
     var id = req.params.id;
 
-    var sql = `SELECT ref_groupid,name,image FROM splitwise.members as m inner join master_group as g on m.ref_groupid = g.groupid where m.status = 2 and m.ref_userID = ${id}`;
+    var sql = `SELECT m.ref_groupid,g.name as groupName,g.image,u.name as invitedBy FROM splitwise.members as m inner join master_group as g on m.ref_groupid = g.groupid inner join users as u ON m.invitedby = u.userid where m.status = 2 and m.ref_userID = ${id}`;
     connection.query(sql, (err, results) => {
         if (err) {
             console.log(err);
@@ -79,6 +79,50 @@ router.put('/invite/', (req, res) => {
         }
     });
 });
+router.put('/updategroup/', (req, res) => {
+
+    console.log(req.body);
+    var groupID = req.body.groupID;
+    var groupName = req.body.groupName;
+    var values = [req.body.groupName, groupID];
+
+    var sql = `update master_group set name = '${groupName}' where groupid = ${groupID}`;
+    connection.query(sql, values, (err, results) => {
+        if (err) {
+            if (err.sqlMessage.includes("Duplicate entry")) {
+                res.status(400).send(' Duplicate Group Name')
+            }
+            res.status(400).end("Error in updating, Please contact database administrator.");
+        }
+        else {
+            console.log("Here");
+             res.status(200).send(JSON.stringify(results));
+
+        }
+    });
+    // var userID = Number(req.body.userID);
+    // var groupID = req.body.groupID;
+    // var type = req.body.type;
+    // var sql = null;
+    // if (type == "accept") {
+    //     sql = `update members set status=2 where ref_userID=${userID} and ref_groupID = ${groupID}`;
+    // }
+    // else {
+    //     sql = `update members set status=0 where ref_userID=${userID} and ref_groupID = ${groupID}`;
+
+    // }
+    // var values = [userID, groupID]
+
+    // connection.query(sql, values, (err, results) => {
+    //     if (err) {
+    //         res.end("Error:", err);
+    //     }
+    //     else {
+    //         res.status(200).send(JSON.stringify(results));
+
+    //     }
+    // });
+});
 router.post('/uploadprofileimage', (req, res) => {
     if (req.files === null) {
         return res.status(400).send('No File Upload');
@@ -95,6 +139,9 @@ router.post('/uploadprofileimage', (req, res) => {
         fs.mkdirSync(filePathwithoutfileName);
     }
     //Move the image to that path
+    console.log(groupID);
+    console.log(fileName);
+    console.log(pathToImage);
     file.mv(filePath, err => {
         if (err) {
             return res.status(500).end(err);

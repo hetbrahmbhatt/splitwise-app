@@ -6,6 +6,8 @@ import axios from 'axios';
 import IndividualGroup from './individual-group';
 import AcceptedGroup from './accepted-groups';
 
+
+//TODO: Empty placeholder for no records
 export class MyGroup extends Component {
     constructor(props) {
         super(props)
@@ -19,7 +21,6 @@ export class MyGroup extends Component {
         console.log(userID);
         const response = await axios.get(BACKEND_URL + "/groups/invitedgroups/" + userID);
         const acceptedResponse = await axios.get(BACKEND_URL + "/groups/acceptedgroups/" + userID);
-        console.log(acceptedResponse);
         acceptedResponse.data.map((acceptedGroups) => {
             this.setState({
                 acceptedGroups: [...this.state.acceptedGroups, acceptedGroups]
@@ -33,10 +34,10 @@ export class MyGroup extends Component {
             })
 
         })
-        console.log("get groups", this.state)
     }
     render() {
         var redirectVar = null;
+
         if (!cookie.load("auth")) {
             redirectVar = <Redirect to="/login" />
         }
@@ -56,6 +57,7 @@ export class MyGroup extends Component {
 
             )
         })
+
         return (
             <div>
                 { redirectVar}
@@ -66,12 +68,15 @@ export class MyGroup extends Component {
                         {groupInvitationDetails}
 
                         <div style={{ "borderLeft": "6px solid black", "height": "10000%", "position": "absolute", "left": "100%", "marginLeft": "-3px", "top": "0px" }}></div>
-
                         {/* 
                          */}
                     </div>
                     <div className="col-6">
+
                         <h1 style={{ marginLeft: "50px", "marginBottom": "40px", "marginLeft": "150px" }}>Your Groups</h1>
+                        <div className="col-6 m-4">
+                            <input type="text" style={{ "width": "400px", "marginLeft" : "10px" }} name="searchInput" onChange={this.handleSearch} placeholder="Search Accepted Groups"></input>
+                        </div>
                         {groupAcceptedDetails}
                     </div>
                 </div>

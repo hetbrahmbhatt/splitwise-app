@@ -19,6 +19,7 @@ export class NewGroup extends Component {
         profileImageUpdate: false,
         updatedProfileImage: "",
         profileImagePath: BACKEND_URL + '/images/avatar.png',
+
     }
     loadOptionsForName = async (inp, callback) => {
         const response = await axios.get(BACKEND_URL + "/users/searchbyname?name_like=" + inp);
@@ -162,7 +163,7 @@ export class NewGroup extends Component {
                         <h5>Start a new group</h5>
                         <h3>My group shall be called...</h3>
                         <form onSubmit={this.handleSubmit} id="Login">
-                            <input type="text" id="groupName" name="groupName" style={{ "width": "300px", "marginBottom": "40px" }} onChange={this.handleInputChange} ></input>
+                            <input placeholder={this.state.groupName} type="text" id="groupName" name="groupName" style={{ "width": "300px", "marginBottom": "40px" }} onChange={this.handleInputChange} ></input>
                             <div onChange={this.handleRadioButtonChange}>
                                 <input type="radio" value="email" name="search" /> Search by email
                                 <input type="radio" value="name" name="search" /> Search by name
