@@ -89,7 +89,6 @@ export class NewGroup extends Component {
                     if (response.status === 200) {
                         toast.success("Group Created Successfully");
                         window.location.assign("/users/dashboard");
-                        console.log(response.data.groupID);
                         const formData = new FormData();
                         formData.append('profileImage', this.state.updatedProfileImage, this.state.updatedProfileImage.name + "," + response.data.groupID)
                         const config = {
@@ -155,7 +154,7 @@ export class NewGroup extends Component {
                     <div className="col-3"></div>
                     <div className="col-2">
                         <img src={this.state.profileImagePath} width="200" height="200" alt="" />
-                        <div className="row">
+                        <div className="row p-1 m-3">
                             <input style={{ "marginLeft": '20px' }} accept="image/x-png,image/gif,image/jpeg" type="file" name="profileImage" onChange={this.handleImageChange} />
                         </div>
                     </div>
@@ -166,7 +165,7 @@ export class NewGroup extends Component {
                             <input placeholder={this.state.groupName} type="text" id="groupName" name="groupName" style={{ "width": "300px", "marginBottom": "40px" }} onChange={this.handleInputChange} ></input>
                             <div onChange={this.handleRadioButtonChange}>
                                 <input type="radio" value="email" name="search" /> Search by email
-                                <input type="radio" value="name" name="search" /> Search by name
+                                <input style={{marginLeft : "20px"}}type="radio" value="name" name="search" /> Search by name
                             </div>
                             {nameDivision}
                             {emailDivision}

@@ -88,7 +88,7 @@ export class login extends Component {
                             httpOnly: false,
                             maxAge: 90000
                         })
-                        cookie.save("defaultcurrency", " ", {
+                        cookie.save("defaultcurrency", "$", {
                             path: '/',
                             httpOnly: false,
                             maxAge: 90000

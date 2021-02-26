@@ -5,16 +5,18 @@ import BACKEND_URL from '../../config/config'
 import axios from 'axios';
 import IndividualGroup from './individual-group';
 import AcceptedGroup from './accepted-groups';
+import emptyplaceholder from '../../images/empty-placeholder.png'
 
 
-//TODO: Empty placeholder for no records
 export class MyGroup extends Component {
     constructor(props) {
         super(props)
         this.state = {
             groups: [],
             acceptedGroups: [],
-            searchInput: ""
+            searchInput: "",
+            emptygroupsFlag: false,
+            emptyAcceptedGroupsFlag: false
         }
     }
     handleSearch = (e) => {
@@ -25,7 +27,6 @@ export class MyGroup extends Component {
     }
     async componentDidMount() {
         const userID = cookie.load("id")
-        console.log(userID);
         const response = await axios.get(BACKEND_URL + "/groups/invitedgroups/" + userID);
         const acceptedResponse = await axios.get(BACKEND_URL + "/groups/acceptedgroups/" + userID);
         acceptedResponse.data.map((acceptedGroups) => {
@@ -41,22 +42,29 @@ export class MyGroup extends Component {
             })
 
         })
+        if (this.state.groups.length == 0) {
+            this.setState({
+                emptygroupsFlag: true
+            })
+        }
+        if (this.state.acceptedGroups.length == 0) {
+            this.setState({
+                emptyAcceptedGroupsFlag: true
+            })
+        }
         console.log(this.state);
     }
     render() {
         var redirectVar = null;
+        let groupInvitationDetails = null
+        let groupAcceptedDetails = null
+
 
         if (!cookie.load("auth")) {
             redirectVar = <Redirect to="/login" />
         }
-        let groupInvitationDetails = this.state.groups.map((group) => {
-            return (
-                <div>
-                    <IndividualGroup groupData={group} />
-                </div>
 
-            )
-        })
+
         let searchedGroups = this.state.acceptedGroups.filter((group) => {
             if (group.groupName.toLowerCase().includes(this.state.searchInput.toLowerCase())) {
                 return group;
@@ -64,21 +72,44 @@ export class MyGroup extends Component {
             // console.log(group.groupName.toLowerCase().includes(this.state.searchInput.toLowerCase()))
             // return group.groupName.toLowerCase().includes(this.state.searchInput.toLowerCase())
         })
-
-        // let groupAcceptedDetails = searchedGroups.map(group => {
-        //     return (
-        //         <div>
-        //             <AcceptedGroup acceptedGroupData={group} />
-        //         </div>
-        //     )
-        // })
-        let groupAcceptedDetails = searchedGroups.map(group => {
-            return (
-                <AcceptedGroup acceptedGroupData={group} />
+        if (this.state.emptygroupsFlag) {
+            groupInvitationDetails = (
+                <div style={{ margin: "200px" }}>
+                    <img src={emptyplaceholder} width="200px" height="200px" alt="" />
+                    <h4 style={{ font: "Bookman" }}>No invitations yet!!!</h4>
+                </div>
             )
-        })
 
+        }
+        else {
+            groupInvitationDetails = this.state.groups.map((group) => {
+                return (
+                    <div>
+                        <IndividualGroup groupData={group} />
+                    </div>
 
+                )
+            })
+        }
+        if (this.state.emptyAcceptedGroupsFlag) {
+            groupAcceptedDetails = (
+                <div style={{ margin: "130px" }}>
+                    <img src={emptyplaceholder} width="200px" height="200px" alt="" />
+                    <h4 style={{ font: "Bookman" }}>Sorry!! There are no groups</h4>
+                </div>
+            )
+
+        }
+        else {
+            groupAcceptedDetails = this.state.acceptedGroups.map((group) => {
+                return (
+                    <div>
+                        <AcceptedGroup acceptedGroupData={group} />
+                    </div>
+
+                )
+            })
+        }
         return (
             <div>
                 { redirectVar}
@@ -98,12 +129,8 @@ export class MyGroup extends Component {
                         <div className="col-6 m-4">
                             <input type="text" style={{ "width": "400px", "marginLeft": "10px" }} name="searchInput" onChange={this.handleSearch} placeholder="Search Accepted Groups"></input>
                         </div>
-                        {searchedGroups.map(group => {
-                            // return console.log(group);
-                           return  <AcceptedGroup acceptedGroupData={group} />
+                        {groupAcceptedDetails}
 
-                        })}
-                        
                     </div>
                 </div>
             </div>

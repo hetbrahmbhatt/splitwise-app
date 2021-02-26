@@ -80,22 +80,25 @@ export class AcceptedGroup extends Component {
         }
         let editOption =
             <div>
-                <div className="edit-dish" >
+                <div className="edit-option" >
                     <button className="btn btn-warning" onClick={this.toggleGroupPopUp}>Edit Group</button>
                 </div>
-{/* TODO: Close button in react modal */}
+                {/* TODO: Close button in react modal */}
                 <Modal isOpen={this.state.groupPopUp} >
                     <EditGroup groupData={this.state} ariaHideApp={false}
                         closePopUp={this.toggleGroupPopUp} />
                 </Modal>
             </div>
-        // <div>
-        //     <Link to="/new-group">
-        //         <div className="edit-group" >
-        //             <button className="btn btn-warning">Edit Group</button>
-        //         </div>
-        //     </Link>
-        // </div>
+        let groupDescriptionOption =
+            <div>
+                <div className="profile-edit" style={{ height: "20%" }}>
+                    <Link className="btn btn-primary" to={{
+                        pathname: "/group-description", state: {
+                            groupData: this.state
+                        }
+                    }}>Group Description</Link>
+                </div>
+            </div>
         return (
             <div>
                 <div className="row" style={{ "width": "80%", "height": "200px", "background": "whitesmoke", "marginLeft": "50px" }}>
@@ -119,7 +122,7 @@ export class AcceptedGroup extends Component {
                         <div className="row" ><h6>{editOption}</h6></div>
                     </div>
                     <div className="col-2" style={{ marginLeft: "40px" }}>
-                        <div className="row" ><h6>hi</h6></div>
+                        <div className="row" >{groupDescriptionOption}</div>
                     </div>
                 </div>
             </div >

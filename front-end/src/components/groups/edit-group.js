@@ -55,6 +55,7 @@ export class EditGroup extends Component {
             .put(BACKEND_URL + "/groups/updategroup", this.state).then(response => {
 
                 if (response.status === 200) {
+                    window.location.reload();
                     toast.success("Group Updated Successfully");
                     //window.location.assign("/users/dashboard");
                     const formData = new FormData();
@@ -85,37 +86,6 @@ export class EditGroup extends Component {
                 else
                     toast.error(err.response.data);
             })
-        //         if (response.status === 200) {
-        //             toast.success("Group Created Successfully");
-        //             window.location.assign("/users/dashboard");
-        //             console.log(response.data.groupID);
-        //             const formData = new FormData();
-        //             formData.append('profileImage', this.state.updatedProfileImage, this.state.updatedProfileImage.name + "," + response.data.groupID)
-        //             const config = {
-        //                 headers: {
-        //                     'content-type': 'multipart/form-data'
-        //                 }
-        //             }
-        //             axios
-        //                 .post(BACKEND_URL + '/groups/uploadprofileimage', formData, config).then((response) => {
-        //                     this.setState({
-        //                         profileImagePath: BACKEND_URL + '/images/grouppics/' + response.data.groupID + '/' + response.data.fileName
-
-        //                     })
-
-        //                 }).catch(err => {
-        //                     toast.error("Error in image upload")
-        //                 })
-        //         }
-
-        //     }).catch(err => {
-        //         if (err.response == null) {
-
-        //         }
-        //         else
-        //             toast.error(err.response.data);
-        //     })
-
     }
     render() {
         return (
