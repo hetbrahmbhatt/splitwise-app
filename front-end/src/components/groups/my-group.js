@@ -85,7 +85,7 @@ export class MyGroup extends Component {
             groupInvitationDetails = this.state.groups.map((group) => {
                 return (
                     <div>
-                        <IndividualGroup groupData={group} />
+                        <IndividualGroup  groupData={group} />
                     </div>
 
                 )
@@ -101,10 +101,10 @@ export class MyGroup extends Component {
 
         }
         else {
-            groupAcceptedDetails = this.state.acceptedGroups.map((group) => {
+            groupAcceptedDetails = searchedGroups.map((group) => {
                 return (
                     <div>
-                        <AcceptedGroup acceptedGroupData={group} />
+                        <AcceptedGroup key={group.ref_groupid} acceptedGroupData={group} />
                     </div>
 
                 )
