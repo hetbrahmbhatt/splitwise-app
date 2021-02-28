@@ -96,7 +96,7 @@ router.put('/updategroup/', (req, res) => {
         }
         else {
             console.log("Here");
-             res.status(200).send(JSON.stringify(results));
+            res.status(200).send(JSON.stringify(results));
 
         }
     });
@@ -220,6 +220,199 @@ router.post('/new', (req, res) => {
 
 
 
+router.post('/expenses', (req, res) => {
+    let timestamp = null;
+    var ref_expenseid = null;
+    console.log(req.body);
+    var groupID = req.body.groupID;
+    var currency = req.body.currency;
+    var ref_paidby = req.body.userID;
+    var description = req.body.description;
+    var amount = req.body.amount;
+    let dateObject = new Date(new Date());
+    let date = dateObject.getDate().toString();
+    let month = (dateObject.getMonth() + 1).toString();
+    let year = dateObject.getFullYear().toString();
+    let time = dateObject.getHours().toString() + "-" + dateObject.getMinutes().toString() + "-" + dateObject.getSeconds().toString();
+    timestamp = year + "-" + month + "-" + date + "-" + time;
+    //Getting the total group members
+    var sql = `SELECT m.ref_userid,invitedby FROM splitwise.master_group as g inner join members as m on g.groupid = m.ref_groupid where status=2 and ref_groupid = ${groupID}`
+    var group_members = [];
+    var group_members2 = [];
+    connection.query(sql, (err, results) => {
+        if (err) {
+            console.log(err);
+            res.status(400).end("Error:", err);
+        }
+        else {
+            group_members2.push(results[0].invitedby);
+            group_members.push(results[0].invitedby)
+            for (let i = 0; i < results.length; i++) {
+                group_members.push(results[i].ref_userid);
+                group_members2.push(results[i].ref_userid);
+            }
+            var values = [groupID, ref_paidby, amount, description, req.body.currency, timestamp];
+            var sql = `insert into master_expense(ref_groupid,ref_paidby,amount,description,currency,createdat) values(?,?,?,?,?,?);`
+            connection.query(sql, values, (err, results, fields) => {
+                if (err) {
+                    console.log(err);
+                    res.status(400).send("Error");
+                }
+                else {
+                    var total_Members = group_members2.length;
+                    dividedAmount = amount / total_groupMembers;
+                    ref_expenseid = results.insertId;
+                    console.log("Here --------->");
+                    for (let i = 0; i < group_members2.length; i++) {
+                        var sql = `select * from recent_activity where ref_userid = ${group_members2[i]} and ref_groupid = ${groupID} and currency = '${req.body.currency}' order by createdat desc limit 1`;
+                        connection.query(sql, (err, results, fields) => {
+                            if (err) {
+                                console.log(err);
+                                // res.status(400).send("Error");
+                            }
+                            else {
+                                if (results.length > 0) {
+                                    if (group_members2[i] == req.body.userID) {
+                                        groupBalance = dividedAmount * (total_Members - 1);
+                                    }
+                                    else {
+                                        groupBalance = -(dividedAmount);
+                                    }
+                                    var oldgBalance = results[0].groupbalance;
+                                    var oldtBalance = results[0].totalbalance;
+                                    console.log("oldgBalance",oldgBalance);
+                                    console.log("groupBalance",groupBalance);
+                                    var newgBalance = parseFloat(Number(oldgBalance) + Number(groupBalance));
+                                    console.log(newgBalance);
+                                    var newtotalbalance = parseFloat(Number(oldtBalance) + Number(groupBalance));
+                                    console.log(newtotalbalance);
+                                    var recentactivityid = results[0].recentactivityid;
+                                    var sql = `update recent_activity set groupbalance=${newgBalance},totalbalance=${newtotalbalance} where recentactivityid=${recentactivityid}`;
+                                    connection.query(sql,(err, results) => {
+                                        if (err) {
+                                            console.log(err);
+                                            //res.status(400).end("Error:", err);
+                                        }
+                                        else {
+                                           console.log(results);
+                                        }
+                                    });
+                                }
+                                else {
+                                    if (group_members2[i] == req.body.userID) {
+                                        groupBalance = dividedAmount * (total_Members - 1);
+                                    }
+                                    else {
+                                        groupBalance = -(dividedAmount);
+                                    }
+                                    var values = [ref_expenseid, group_members2[i], amount, groupID, currency, groupBalance, groupBalance, timestamp, null];
+                                    var sql = `insert into recent_activity(ref_expenseid,ref_userid,amount,ref_groupid,currency,groupbalance,totalbalance,createdat,updatedat) values(?,?,?,?,?,?,?,?,?);`
+                                    connection.query(sql, values, (err, results, fields) => {
+                                        if (err) {
+                                            console.log(err);
+                                            // res.status(400).send("Error");
+                                        }
+                                        else {
 
+                                        }
+                                    });
+                                }
+
+                            }
+                        });
+                    }
+                }
+            })
+            var total_groupMembers = group_members.length;
+            dividedAmount = amount / total_groupMembers;
+            const index = group_members.indexOf(Number(ref_paidby));
+            if (index > -1) {
+                group_members.splice(index, 1);
+            }
+            for (let i = 0; i < group_members.length; i++) {
+                var userid1 = group_members[i];
+                var values = null;
+                var userid2 = ref_paidby;
+                var currency = req.body.currency;
+                var ref_groupid = req.body.ref_groupid;
+                if (userid1 > userid2) {
+                    values = [userid2, userid1, currency, dividedAmount, req.body.groupID, timestamp];
+
+                }
+                else {
+                    values = [userid1, userid2, currency, dividedAmount, req.body.groupID, timestamp];
+
+                }
+                var sql = null;
+
+                if (userid1 > userid2) {
+                    sql = `select * from debt where userid1=${userid2} and userid2=${userid1} and currency='${currency}' and ref_groupid= ${groupID}`;
+                }
+                else {
+                    sql = `select * from debt where userid1=${userid1} and userid2=${userid2} and currency='${currency}' and ref_groupid= ${groupID}`;
+
+                }
+                connection.query(sql, values, (err, results, fields) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                    else {
+                        var userid1 = group_members[i];
+                        var userid2 = req.body.userID;
+                        var sql = null
+                        var values = null
+                        if (results.length > 0) {
+                            if (results[0].userid2 == req.body.userID) {
+                                var sql = `update debt set amount = amount + ${dividedAmount} where debtid = ${results[0].debtid}`;
+                                connection.query(sql, (err, results, fields) => {
+                                    if (results.length > 0) {
+                                        console.log("bvjlhfbhbebfcdjdfbchlebdfleqkf Over here")
+                                    }
+                                    else {
+                                       // console.log(results);
+                                    }
+                                });
+                            }
+                            else {
+                                var sql = `update debt set amount = amount - ${dividedAmount} where debtid = ${results[0].debtid}`;
+                                connection.query(sql, (err, results, fields) => {
+                                    if (results.length > 0) {
+                                       // console.log("bvjlhfbhbebfcdjdfbchlebdfleqkf Over here")
+                                    }
+                                    else {
+                                       // console.log(results);
+                                    }
+                                });
+                            }
+                        }
+                        else {
+                            if (userid1 > userid2) {
+                                sql = `insert into debt(userid1,userid2,currency,amount,ref_groupid,createdat) values(?,?,?,?,?,?);`;
+                                values = [userid2, userid1, currency, -dividedAmount, req.body.groupID, timestamp];
+
+                            }
+                            else {
+                                sql = `insert into debt(userid1,userid2,currency,amount,ref_groupid,createdat) values(?,?,?,?,?,?);`;
+                                values = [userid1, userid2, currency, dividedAmount, req.body.groupID, timestamp];
+
+                            }
+                            connection.query(sql, values, (err, results, fields) => {
+                                if (results.length > 0) {
+                                    console.log("Over here")
+                                }
+                                else {
+                                    // console.log(results);
+                                }
+                            });
+                        }
+                        // var sql = `update debt set where groupID=${groupID}`;
+
+                    }
+                });
+            }
+
+        }
+    });
+});
 
 module.exports = router;
