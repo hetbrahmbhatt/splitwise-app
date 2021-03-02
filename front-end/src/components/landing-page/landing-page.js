@@ -3,7 +3,10 @@ import { Redirect } from 'react-router';
 import './landing-page.css';
 import cookie from "react-cookies";
 import { Link } from 'react-router-dom';
-import splitwiselogo from '../../images/splitwise-logo.png'
+import landingpagephoto from '../../images/main-page.png'
+import landingpagephoto2 from '../../images/main-page-2.png'
+import airplane from '../../images/airplane.png'
+
 import { BsHouseDoorFill, BsFillHeartFill } from "react-icons/bs";
 import { FaRegSnowflake, FaPlaneDeparture } from "react-icons/fa";
 export class landingPage extends Component {
@@ -33,7 +36,7 @@ export class landingPage extends Component {
                 <div className="second__component">
                     <div className="second__first__part">
                         <div className="second__text">
-                            Less stress when sharing expenses{' '} with anyone.
+                            <strong>Less stress when sharing expenses{' '} <b>with anyone.</b></strong>
                         </div>
                         <div className="Icons">
                             <ul class="second__Icons">
@@ -43,18 +46,22 @@ export class landingPage extends Component {
                                 <li><BsFillHeartFill size={40} color="maroon" /></li>
                             </ul>
                         </div>
-                        <div className="second__smallText">Keep track of your shared expenses and balances with trips,groups and families. </div>
+                        <div className="second__smallText"><strong>Keep track of your shared expenses and balances with trips,groups and families. </strong></div>
 
                         <Link to="/signup">
-                            <button type="button" style={{ "height": "50px", "width": "170px", "margin-left": "200px", "margin-top": "20px" }} class="btn btn-success btn-lg">Sign-Up</button>
+                            <button type="button" style={{ "height": "50px", "width": "170px", "margin-left": "200px", "margin-top": "20px" ,backgroundColor : ""}} class="btn btn-success btn-lg">Sign-Up</button>
                         </Link>
 
                     </div>
                     <div className="second__second__part">
 
-                        <span><FaRegSnowflake size={600} color="lightgrey" /></span>
-                    </div>
+                    <img
+                    src={airplane} style = {{marginTop : "70px"}}height = "70%"width="70%" alt="" />                    </div>
                 </div>
+                <img
+                    src={landingpagephoto} width="100%" alt="" />
+                <img
+                    src={landingpagephoto2} width="100%" alt="" />
             </div>
         )
     }

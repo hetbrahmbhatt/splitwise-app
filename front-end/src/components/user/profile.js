@@ -81,6 +81,7 @@ export class Profile extends Component {
                 .put(BACKEND_URL + "/users/editprofile", this.state).then(response => {
                     if (response.status === 200) {
                         if (this.state.profileImageUpdate) {
+                            console.log("object")
                             const formData = new FormData();
                             formData.append('profileImage', this.state.updatedProfileImage, this.state.updatedProfileImage.name + "," + this.state.userID)
                             const config = {

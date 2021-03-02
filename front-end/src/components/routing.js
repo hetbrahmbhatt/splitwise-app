@@ -9,6 +9,7 @@ import Profile from './user/profile';
 import NewGroup from './groups/new-group';
 import MyGroup from './groups/my-group';
 import GroupDescription from './groups/group-description';
+import RecentActivity from '../components/user/recent-activity';
 
 export class Routing extends Component {
     render() {
@@ -27,6 +28,9 @@ export class Routing extends Component {
                 <Route path='/new-group' component={NewGroup} />
                 <Route path='/all-group' component={MyGroup} />
                 <Route path='/group-description' component={GroupDescription} />
+
+                {/* Recent Activity */}
+                <Route path='/recent-activity' component={RecentActivity} />
 
 
             </div>

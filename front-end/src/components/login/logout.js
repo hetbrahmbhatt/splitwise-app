@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Redirect } from 'react-router'
 import cookie from "react-cookies";
 import _ from 'lodash';
+
 export class logout extends Component {
     render () {
         var cookies = null;
