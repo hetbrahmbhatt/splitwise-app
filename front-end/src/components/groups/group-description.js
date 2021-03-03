@@ -131,7 +131,7 @@ export class GroupDescription extends Component {
                                 <button type="submit" className="btn btn-amber" onClick={this.toggleGroupPopUp} style={{ marginLeft: "70px", marginTop: "25px", height: "40px", width: "250px", backgroundColor: "#FF7F50", color: "white" }} >Add an Expense</button>
                                 <div style={{ height: "200px" }}>
                                     <Modal style={customStyles} isOpen={this.state.groupPopUp} ariaHideApp={false}>
-                                        <AddExpense groupData={this.state} />
+                                        <AddExpense groupData={this.state} closePopUp={this.toggleGroupPopUp}/>
                                     </Modal>
                                 </div>
 

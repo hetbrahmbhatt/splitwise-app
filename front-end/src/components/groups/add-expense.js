@@ -77,8 +77,8 @@ export class AddExpense extends Component {
                     </div>
                     <div class="row" style={{ "backgroundColor": "whitesmoke" }} >
                         <p style={{ "margin": "10px" }}>
-                            With <b>you</b> and
-                            <img style={{ marginLeft: "30px", "borderRadius": "200px" }} src={this.state.groupImagePath} width="20" height="20" alt="" />
+                            With <b>you</b> and:
+                            <img style={{ marginLeft: "10px", "borderRadius": "200px" }} src={this.state.groupImagePath} width="20" height="20" alt="" />
                             All of <b>{this.state.groupName}</b>
                         </p>
                     </div>
@@ -103,8 +103,8 @@ export class AddExpense extends Component {
                                 <div className="row">
                                     <input value={cookie.load('defaultcurrency')} size="1" style={{ marginTop: "10px", marginLeft: "20px", marginRight: "5px", border: "0", marginBottom: "-13px" }}></input>  <input placeholder="0.00" type="text" size="17" id="amount" name="amount" style={{ border: "0", borderBottom: "2px dotted", marginTop: "20px" }} onChange={this.handleInputChange} ></input>
                                 </div>
-
-                                <button type="submit" className="btn btn-amber" style={{ "backgroundColor": "#20BF9F", "marginTop": "100px", "marginLeft": "10px" }} onSubmit={this.handleSubmit}>Save</button>
+                                <button type="submit" className="btn btn-amber" style={{ "backgroundColor": "#20BF9F", "marginTop": "150px", "marginLeft": "10px" }} onSubmit={this.handleSubmit}>Save</button>
+                                <button className="btn btn-danger" style={{"marginLeft" : "10px","marginTop" : "150px"}}onClick={ this.props.closePopUp }>Back</button>
                             </form>
                         </div>
                     </div>

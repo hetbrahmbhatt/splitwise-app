@@ -75,7 +75,7 @@ export class MyGroup extends Component {
         if (this.state.emptygroupsFlag) {
             groupInvitationDetails = (
                 <div style={{ margin: "200px" }}>
-                    <img src={emptyplaceholder} width="200px" height="200px" alt="" />
+                    <img src={emptyplaceholder} width="300px" height="200px" alt="" />
                     <h4 style={{ font: "Bookman" }}>No invitations yet!!!</h4>
                 </div>
             )
@@ -85,7 +85,7 @@ export class MyGroup extends Component {
             groupInvitationDetails = this.state.groups.map((group) => {
                 return (
                     <div>
-                        <IndividualGroup  groupData={group} />
+                        <IndividualGroup groupData={group} />
                     </div>
 
                 )
@@ -94,7 +94,7 @@ export class MyGroup extends Component {
         if (this.state.emptyAcceptedGroupsFlag) {
             groupAcceptedDetails = (
                 <div style={{ margin: "130px" }}>
-                    <img src={emptyplaceholder} width="200px" height="200px" alt="" />
+                    <img src={emptyplaceholder} width="300px" height="200px" alt="" />
                     <h4 style={{ font: "Bookman" }}>Sorry!! There are no groups</h4>
                 </div>
             )

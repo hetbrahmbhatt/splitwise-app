@@ -4,12 +4,12 @@ import BACKEND_URL from '../../config/config'
 import axios from 'axios';
 import cookie from "react-cookies";
 import NewGroup from './new-group';
-import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import Modal from 'react-modal';
 import _ from 'lodash';
 import EditGroup from './edit-group';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 // TODO: Leave Button Request in the backend needs to be updated 
 export class AcceptedGroup extends Component {
     constructor(props) {
@@ -19,7 +19,8 @@ export class AcceptedGroup extends Component {
             groupName: this.props.acceptedGroupData.groupName,
             image: this.props.acceptedGroupData.image,
             invitedBy: this.props.acceptedGroupData.invitedBy,
-            groupPopUp: false
+            groupPopUp: false,
+            editGroupPopUp: false,
 
         }
     }
@@ -40,10 +41,28 @@ export class AcceptedGroup extends Component {
                 }
             });
     }
+
     toggleGroupPopUp = (e) => {
         this.setState({
             groupPopUp: !this.state.groupPopUp
         })
+    }
+    leaveGroup = (e) => {
+        console.log(this.state);
+        var obj = {
+            userID: cookie.load('id'),
+            groupID: this.state.groupID
+        }
+
+        axios
+            .post(BACKEND_URL + "/groups/leavegroup", obj).then(response => {
+                if (response.status == 200) {
+                    toast.success("Hope you have a great time after leaving the group :)")
+                    window.location.reload();
+                }
+            }) .catch( err => {
+                toast.error("Please clear all the dues before leaving the group.")
+            } )
     }
     ignorebuttonClick = e => {
         var object = {
@@ -60,7 +79,6 @@ export class AcceptedGroup extends Component {
             });
     }
     displayPicture = (name, groupID) => {
-        console.log(groupID);
         if (name == null) {
             var groupImagePath = BACKEND_URL + "/images/avatar.png"
 
@@ -86,7 +104,7 @@ export class AcceptedGroup extends Component {
                 {/* TODO: Close button in react modal */}
                 <Modal isOpen={this.state.groupPopUp} >
                     <EditGroup groupData={this.state} ariaHideApp={false}
-                        closePopUp={this.toggleGroupPopUp} />
+                        closePopUp={this.toggleGroupPopUp}/>
                 </Modal>
             </div>
         let groupDescriptionOption =
@@ -117,12 +135,15 @@ export class AcceptedGroup extends Component {
                         <div className="row p-1 m-3"><h3>{this.state.invitedBy}</h3></div>
                     </div>
                 </div>
-                <div className="row p-4" style={{ marginLeft: "160px" }}>
+                <div className="row p-4" style={{ marginLeft: "50px" }}>
                     <div className="col-2">
                         <div className="row" ><h6>{editOption}</h6></div>
                     </div>
                     <div className="col-2" style={{ marginLeft: "40px" }}>
                         <div className="row" >{groupDescriptionOption}</div>
+                    </div>
+                    <div className="col-3" style={{ marginLeft: "80px" }}>
+                        <button className="btn btn-danger" onClick={this.leaveGroup}>Leave</button>
                     </div>
                 </div>
             </div >

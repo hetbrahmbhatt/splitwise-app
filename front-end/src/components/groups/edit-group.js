@@ -93,6 +93,7 @@ export class EditGroup extends Component {
                 <h1 style={{ marginLeft: "500px" }}>Edit Group Details</h1>
                 <div className="row" style={{ "height": "10vh" }}>
                 </div>
+
                 <div className="row" style={{ "height": "100vh" }}>
                     <div className="col-3"></div>
                     <div className="col-2">
@@ -106,7 +107,7 @@ export class EditGroup extends Component {
                         <form onSubmit={this.handleSubmit} id="Login">
                             <input placeholder={this.state.groupName} type="text" id="groupName" name="groupName" style={{ "width": "300px", "marginTop": "30px" }} onChange={this.handleInputChange} ></input>
                             <button type="submit" className="btn btn-success" style={{ "backgroundColor": "#FF8C00", "marginTop": "200px", "marginLeft": "10px" }} onSubmit={this.handleSubmit}>Save</button>
-
+                            <button className="btn btn-danger" onClick={ this.props.closePopUp }>Back</button>
                         </form>
                         <ToastContainer />
                     </div>
