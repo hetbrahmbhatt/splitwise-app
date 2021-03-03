@@ -48,8 +48,6 @@ router.post('/signup', (req, res) => {
     });
 });
 
-
-
 //login
 router.post('/login', (req, res) => {
     var email = req.body.email

@@ -4,7 +4,8 @@ var pool = mysql.createPool( {
     user: 'root',
     password: 'masterpassword',
     database: 'splitwise',
-    connectionLimit: 10
+    connectionLimit: 10,
+    multipleStatements: true
 } )
 
 module.exports = {

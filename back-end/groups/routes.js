@@ -53,6 +53,62 @@ router.get('/acceptedgroups/:id', (req, res) => {
 
     });
 });
+router.get('/totalgroups/:id', (req, res) => {
+    var userID = req.params.id;
+    console.log("here");
+    var sql = `select mg.groupid,mg.name from master_group as mg inner join members as me on mg.groupid = me.ref_groupid where status = 2 and me.ref_userid = ${userID};`;
+    connection.query(sql, (err, results) => {
+        if (err) {
+
+        }
+        else {
+            res.status(200).send(JSON.stringify(results));
+
+        }
+    })
+
+});
+router.post('/recentactivitybygroups/', (req, res) => {
+    console.log("--------------")
+    console.log(req.body);
+    var userID = req.body.userID;
+    var groupID = req.body.groupID;
+    var orderBy = req.body.orderBy;
+    var sql = null;
+    if (groupID == null)
+        sql = `SELECT mu.name as username,me.amount,me.createdat,me.ref_paidby,me.currency,mg.name,mg.groupid,mg.count,me.description,mg.image FROM splitwise.master_expense as me inner join users as mu on mu.userid = me.ref_paidby inner join master_group as mg on me.ref_groupid = mg.groupid where ref_groupid IN (select m.ref_groupid from members as m  inner join master_group as me on m.ref_groupid = me.groupid where status=2 and m.ref_userid = ${userID} ) order by createdat ${orderBy};`;
+    else
+        sql = `SELECT mu.name as username,me.amount,me.createdat,me.ref_paidby,me.currency,mg.name,mg.groupid,mg.count,me.description,mg.image FROM splitwise.master_expense as me inner join users as mu on mu.userid = me.ref_paidby inner join master_group as mg on me.ref_groupid = mg.groupid where ref_groupid IN (select m.ref_groupid from members as m  inner join master_group as me on m.ref_groupid = me.groupid where status=2 and m.ref_userid = ${userID} and groupid = ${groupID} ) order by createdat ${orderBy};`;
+    // var sql = `select mg.groupid,mg.name from master_group as mg inner join members as me on mg.groupid = me.ref_groupid where status = 2 and me.ref_userid = ${userID};`;
+    connection.query(sql, (err, results) => {
+        if (err) {
+
+        }
+        else {
+            res.status(200).send(JSON.stringify(results));
+
+        }
+    })
+
+});
+router.get('/description/:id', (req, res) => {
+    var groupID = req.params.id;
+
+    var sql = `select me.description,u.name,me.amount,me.createdat,me.currency from master_expense me inner join users  u on u.userid = me.ref_paidby where ref_groupid = ${groupID} order by createdat desc`;
+
+    connection.query(sql, (err, results) => {
+        if (err) {
+            console.log(err);
+            res.end("Error:", err);
+        } else {
+            res.status(200).send(JSON.stringify(results));
+        }
+
+    });
+});
+
+
+
 router.put('/invite/', (req, res) => {
 
     console.log(req.body);
@@ -61,14 +117,15 @@ router.put('/invite/', (req, res) => {
     var type = req.body.type;
     var sql = null;
     if (type == "accept") {
-        sql = `update members set status=2 where ref_userID=${userID} and ref_groupID = ${groupID}`;
+        sql = `update members set status=2 where ref_userID=${userID} and ref_groupID = ${groupID};`;
+        sql = sql + `update master_group set count = count + 1 where groupid = ${groupID};`;
     }
     else {
         sql = `update members set status=0 where ref_userID=${userID} and ref_groupID = ${groupID}`;
 
     }
     var values = [userID, groupID]
-
+    console.log(sql);
     connection.query(sql, values, (err, results) => {
         if (err) {
             res.end("Error:", err);
@@ -183,8 +240,7 @@ router.post('/new', (req, res) => {
 
         }
         else {
-            console.log(results.insertId);
-            console.log(req.body.selectedUsers.length);
+
             for (var i = 0; i < req.body.selectedUsers.length; i++) {
                 var ref_userID = req.body.selectedUsers[i].value;
                 var ref_groupID = results.insertId;
@@ -201,9 +257,8 @@ router.post('/new', (req, res) => {
 
             }
             var sql = `insert into members(ref_userID,ref_groupID,status,invitedBy) values(?,?,?,?);`
-            var values = [req.body.userID, results.insertId, status, req.body.userID];
+            var values = [req.body.userID, results.insertId, 2, req.body.userID];
             //TODO: The id of the person appears twice, change that 
-
             connection.query(sql, values, (err, results, fields) => {
                 if (err) {
                     console.log(err);
@@ -217,11 +272,114 @@ router.post('/new', (req, res) => {
         }
     });
 })
+router.post('/leavegroup', (req, res) => {
+    console.log(req.body)
+    var userID = req.body.userID;
+    var groupID = req.body.groupID;
+    var sql = `select groupbalance from recent_activity where ref_userid = ${userID} and ref_groupid = ${groupID} and groupbalance!=0;`;
+    connection.query(sql, (err, results) => {
+        if (err) {
+            res.send(400).end("Something went wrong");
+        }
+        else {
+            console.log(results);
+            if (results.length <= 0) {
+                console.log("object")
+                var newsql = `update members set status=3 where ref_userID=${userID} and ref_groupID = ${groupID}`;
+                connection.query(newsql, (err, results) => { });
+                res.send(200).end("Hope you have a great time after leaving the group :)")
+            }
+            else {
+                res.send(400);
+            }
+            // res.status(200).send(JSON.stringify(results));
+        }
+    });
+});
+router.get('/recentactivity/:id', (req, res) => {
+    var userID = req.params.id;
+    var sql = `SELECT mu.name as username,me.amount,me.createdat,me.ref_paidby,me.currency,mg.name,mg.groupid,mg.count,me.description,mg.image FROM splitwise.master_expense as me inner join users as mu on mu.userid = me.ref_paidby inner join master_group as mg on me.ref_groupid = mg.groupid where ref_groupid IN (select m.ref_groupid from members as m  inner join master_group as me on m.ref_groupid = me.groupid where status=2 and m.ref_userid = ${userID}) order by createdat desc;`;
+    connection.query(sql, (err, results) => {
+        if (err) {
+            res.send(400).end("Sorry! Nothing to display");
+        }
+        else {
+            console.log(results);
+            res.status(200).send(JSON.stringify(results));
+        }
+    });
+});
+router.post('/individualexpense/:id', async (req, res) => {
+    console.log(req.body);
+    console.log(req.params.id);
+    groupID = req.params.id;
+    var result = [];
+    const results = req.body;
+    for (let i = 0; i < results.length; i++) {
+        var sql = `select sum(groupbalance),currency,ref_groupid,ref_userid,u.name from recent_activity as ra inner join users as u  on ra.ref_userid = u.userid   where ref_userid = ${results[i].ref_userid}  and ref_groupid = ${groupID} group by ref_groupid,currency ;`;
+        await connection.query(sql, (err, sqlresults) => {
+            if (err) {
+                console.log(err);
+                res.sendStatus(500);
+                return;
+            }
+            else {
+                for (let j = 0; j < sqlresults.length; j++) {
+                    if (sqlresults[j]['sum(groupbalance)'] < 0) {
+                        result.push(results[i].name + " owes " + sqlresults[j]['currency'] + ((-1) * sqlresults[j]['sum(groupbalance)']));
+                        // x.set(results[i].ref_userid,x.get(results[i].ref_userid) + "/" + results[i].name + " owes " + sqlresults[j]['currency'] + ((-1) * sqlresults[j]['sum(groupbalance)']) );
 
+                    }
+                    else {
+                        result.push(results[i].name + " gets back " + sqlresults[j]['currency'] + ((1) * sqlresults[j]['sum(groupbalance)']));
 
+                        // x.set(results[i].ref_userid,x.get(results[i].ref_userid) + "/" + results[i].name + " gets back " + sqlresults[j]['currency'] + sqlresults[j]['sum(groupbalance)'] );
+                    }
+                    // if(x.has(results[i].ref_userid)){
+                    //     if(sqlresults[j]['sum(groupbalance)'] < 0){
+                    //         x.set(results[i].ref_userid,x.get(results[i].ref_userid) + "/" + results[i].name + " owes " + sqlresults[j]['currency'] + ((-1) * sqlresults[j]['sum(groupbalance)']) );
 
+                    //     }
+                    //     else{
+                    //         x.set(results[i].ref_userid,x.get(results[i].ref_userid) + "/" + results[i].name + " gets back " + sqlresults[j]['currency'] + sqlresults[j]['sum(groupbalance)'] );
+                    //     }
+                    // }
+                    // else{
+                    //     if(sqlresults[j]['sum(groupbalance)'] < 0){
+                    //         x.set(results[i].ref_userid,results[i].name + " owes " + sqlresults[j]['currency'] + ((-1) * sqlresults[j]['sum(groupbalance)']) );
+                    //     }
+                    //     else
+                    //     {
+                    //         x.set(results[i].ref_userid, results[i].name + " gets back " + sqlresults[j]['currency'] + sqlresults[j]['sum(groupbalance)'] );
+                    //     }
+                    // }
+                }
+                res.write(result);
+            }
+        });
+    }
+});
+
+router.get('/individualdata/:id', async (req, res) => {
+    var result = []
+    var resultsx = null;
+    var groupID = req.params.id;
+    var sql = `select me.ref_userid,mu.name from master_group as mg inner join members as me on mg.groupid = me.ref_groupid inner join users as mu on me.ref_userid = mu.userid  where status=2 and mg.groupid = ${groupID};`;
+    await connection.query(sql, (err, results) => {
+        if (err) {
+            // res.send(400).end("Sorry! Nothing to display");
+        }
+        else {
+            res.status(200).send(JSON.stringify(results))
+        }
+
+    });
+});
 router.post('/expenses', (req, res) => {
+    console.log(req);
     let timestamp = null;
+    var totalbalance = null;
+    var oldtBalance = 0;
     var ref_expenseid = null;
     console.log(req.body);
     var groupID = req.body.groupID;
@@ -245,8 +403,6 @@ router.post('/expenses', (req, res) => {
             res.status(400).end("Error:", err);
         }
         else {
-            group_members2.push(results[0].invitedby);
-            group_members.push(results[0].invitedby)
             for (let i = 0; i < results.length; i++) {
                 group_members.push(results[i].ref_userid);
                 group_members2.push(results[i].ref_userid);
@@ -271,6 +427,16 @@ router.post('/expenses', (req, res) => {
                                 // res.status(400).send("Error");
                             }
                             else {
+                                var sql = `select totalbalance from recent_activity where ref_userid = ${group_members2[i]}  and currency = '${req.body.currency}' order by createdat desc limit 1`;
+                                connection.query(sql, (err, results, fields) => {
+                                    if (err) {
+
+                                    }
+                                    else {
+                                        if (results.length > 0)
+                                            oldtBalance = results[0].totalbalance;
+                                    }
+                                });
                                 if (results.length > 0) {
                                     if (group_members2[i] == req.body.userID) {
                                         groupBalance = dividedAmount * (total_Members - 1);
@@ -279,22 +445,19 @@ router.post('/expenses', (req, res) => {
                                         groupBalance = -(dividedAmount);
                                     }
                                     var oldgBalance = results[0].groupbalance;
-                                    var oldtBalance = results[0].totalbalance;
-                                    console.log("oldgBalance",oldgBalance);
-                                    console.log("groupBalance",groupBalance);
                                     var newgBalance = parseFloat(Number(oldgBalance) + Number(groupBalance));
                                     console.log(newgBalance);
                                     var newtotalbalance = parseFloat(Number(oldtBalance) + Number(groupBalance));
                                     console.log(newtotalbalance);
                                     var recentactivityid = results[0].recentactivityid;
                                     var sql = `update recent_activity set groupbalance=${newgBalance},totalbalance=${newtotalbalance} where recentactivityid=${recentactivityid}`;
-                                    connection.query(sql,(err, results) => {
+                                    connection.query(sql, (err, results) => {
                                         if (err) {
                                             console.log(err);
                                             //res.status(400).end("Error:", err);
                                         }
                                         else {
-                                           console.log(results);
+                                            console.log(results);
                                         }
                                     });
                                 }
@@ -369,7 +532,7 @@ router.post('/expenses', (req, res) => {
                                         console.log("bvjlhfbhbebfcdjdfbchlebdfleqkf Over here")
                                     }
                                     else {
-                                       // console.log(results);
+                                        // console.log(results);
                                     }
                                 });
                             }
@@ -377,10 +540,10 @@ router.post('/expenses', (req, res) => {
                                 var sql = `update debt set amount = amount - ${dividedAmount} where debtid = ${results[0].debtid}`;
                                 connection.query(sql, (err, results, fields) => {
                                     if (results.length > 0) {
-                                       // console.log("bvjlhfbhbebfcdjdfbchlebdfleqkf Over here")
+                                        // console.log("bvjlhfbhbebfcdjdfbchlebdfleqkf Over here")
                                     }
                                     else {
-                                       // console.log(results);
+                                        // console.log(results);
                                     }
                                 });
                             }

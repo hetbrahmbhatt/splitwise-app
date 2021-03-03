@@ -20,6 +20,8 @@
     "express-fileupload": "^1.2.1",
     "express-session": "^1.17.1",
     "fs": "0.0.1-security",
+    "gson": "^0.1.5",
+    "hashmap": "^2.4.0",
     "joi": "^17.4.0",
     "mysql": "^2.18.1",
     "nodemon": "^2.0.7",
