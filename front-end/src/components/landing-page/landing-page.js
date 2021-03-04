@@ -49,7 +49,7 @@ export class landingPage extends Component {
                         <div className="second__smallText"><strong>Keep track of your shared expenses and balances with trips,groups and families. </strong></div>
 
                         <Link to="/signup">
-                            <button type="button" style={{ "height": "50px", "width": "170px", "margin-left": "200px", "margin-top": "20px" ,backgroundColor : ""}} class="btn btn-success btn-lg">Sign-Up</button>
+                            <button type="button" style={{ "height": "50px", "width": "170px", "margin-left": "200px", "margin-top": "20px" ,backgroundColor : "#20BF9F"}} class="btn btn-success btn-lg">Sign-Up</button>
                         </Link>
 
                     </div>

@@ -3,7 +3,6 @@ import { Redirect } from 'react-router'
 import BACKEND_URL from '../../config/config'
 import axios from 'axios';
 import cookie from "react-cookies";
-import NewGroup from './new-group';
 import { Link } from 'react-router-dom';
 import Modal from 'react-modal';
 import _ from 'lodash';

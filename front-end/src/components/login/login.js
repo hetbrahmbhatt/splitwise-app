@@ -88,7 +88,7 @@ export class login extends Component {
                             httpOnly: false,
                             maxAge: 90000
                         })
-                        cookie.save("defaultcurrency", "$", {
+                        cookie.save("defaultcurrency", response.data.currency, {
                             path: '/',
                             httpOnly: false,
                             maxAge: 90000
@@ -100,7 +100,7 @@ export class login extends Component {
                         })
 
                         toast.error("Successfully logged in")
-                        window.location.assign('/users/dashboard');
+                        window.location.assign('/dashboard');
                     }
                 })
                 .catch((err) => {

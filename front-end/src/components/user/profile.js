@@ -192,7 +192,7 @@ export class Profile extends Component {
             { value: 'BHD', label: 'BHD(BD)' },
             { value: '£', label: 'GBP(£)' },
             { value: '€', label: 'EUR(€)' },
-            { value: '$', label: 'CAD($)' }
+            { value: 'CAD', label: 'CAD($)' }
         ]
         const timezone = [
             { value: 'PST', label: 'Pacific Standard Time' },
@@ -201,8 +201,11 @@ export class Profile extends Component {
             { value: 'EST', label: 'Eastern Standard Time' },
         ]
         const language = [
-            { value: 'EN', label: 'English' },
-            { value: 'ESP', label: 'Spanish' },
+            { value: 'English', label: 'English' },
+            { value: 'Spanish', label: 'Spanish' },
+            { value: 'Chinese', label: 'Chinese' },
+            { value: 'Mandarin', label: 'Mandarin' },
+            { value: 'French', label: 'French' },
 
         ]
         if (!(cookie.load("auth"))) {

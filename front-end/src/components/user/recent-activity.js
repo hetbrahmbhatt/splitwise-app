@@ -208,7 +208,7 @@ export class RecentActivity extends Component {
             <div className="row">
                 <div className="col-3 p-1 m-3">
                     <Select
-                        style={{ width: "400px", marginLeft: "-30px" }}
+                        style={{ width: "300px", marginLeft: "-30px" }}
                         name="form-field-name"
                         onChange={this.handleChange}
                         labelKey='name'
@@ -219,9 +219,7 @@ export class RecentActivity extends Component {
                     <Select
                         style={{ width: "400px", marginLeft: "-30px" }}
                         name="form-field-name"
-                        labelKey='name'
                         onChange={this.handleOrderByChange}
-                        valueKey='groupid'
                         placeholder="Select Order by"
                         options={orderByOptions}
                     />

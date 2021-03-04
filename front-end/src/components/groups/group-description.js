@@ -68,9 +68,9 @@ export class GroupDescription extends Component {
                 groupDescription: [...this.state.groupDescription, groupDescription]
             })
         })
-        // const individualData = await axios.get(BACKEND_URL + "/groups/individualdata/" + groupID);
+        const individualData = await axios.get(BACKEND_URL + "/groups/individualdata/" + groupID);
         // console.log(individualData.data);
-        // const individualExpense = await axios.post(BACKEND_URL + "/groups/individualexpense/" + groupID,individualData.data);
+        const individualExpense = await axios.post(BACKEND_URL + "/groups/individualexpense/" + groupID,individualData.data);
         // console.log(individualExpense.data);
         // console.log(this.state);
     }

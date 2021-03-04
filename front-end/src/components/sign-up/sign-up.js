@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import BACKEND_URL from '../../config/config';
-import splitwiselogo from '../../images/splitwise-logo.png'
+import splitwiselogo from '../../images/signup.png'
 import cookie from "react-cookies";
 
 export class signup extends Component {
@@ -94,6 +94,11 @@ export class signup extends Component {
                             httpOnly: false,
                             maxAge: 90000
                         })
+                        cookie.save("defaultcurrency", response.data.currency, {
+                            path: '/',
+                            httpOnly: false,
+                            maxAge: 90000
+                        })
                         window.location.assign('/users/dashboard');
                     }
                     console.log(response.status);
@@ -119,10 +124,13 @@ export class signup extends Component {
         return (
             <div>
                 <div className="row" style={{ height: "100vh", "padding": "10%" }}>
+                    <div className="col-5">
+                    <img src={splitwiselogo} style={{marginLeft : "360px",marginTop:"-50px"}}width="220" height="250" alt="" />
+
+                    </div>
                     <div className="col-5" style={{ "paddingLeft": "10%" }}>
                         <div className='row' style={{ "height": "90%" }}>
                             <div className="col-12">
-                                <img src={splitwiselogo} width="80" height="60" alt="" />
                                 <h4 >Please Introduce Yourself</h4>
                                 <form onSubmit={this.handleSubmit} style={{ "margin": "10px" }} id="Signup">
                                     <div className="form-group">
