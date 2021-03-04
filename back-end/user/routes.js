@@ -25,7 +25,7 @@ router.post('/signup', (req, res) => {
                 res.status(500).end('Error');
 
             } else {
-                var sql = `select userID,name,email,password from users where email="${email}"`;
+                var sql = `select userID,name,email,password,defaultcurrency from users where email="${email}"`;
                 connection.query(sql, (err, results) => {
                     if (err) {
                         console.log(err);
@@ -34,7 +34,8 @@ router.post('/signup', (req, res) => {
                         userdata = {
                             id: results[0].userID,
                             name: results[0].name,
-                            email: results[0].email
+                            email: results[0].email,
+                            currency: results[0].defaultcurrency
                         }
                         req.session.user = email;
 
@@ -52,7 +53,7 @@ router.post('/signup', (req, res) => {
 router.post('/login', (req, res) => {
     var email = req.body.email
     var password = req.body.password
-    var sql = `select userID,name,email,password from users where email="${email}"`;
+    var sql = `select userID,name,email,password,defaultcurrency from users where email="${email}"`;
 
     connection.query(sql, (err, results) => {
         if (err) {
@@ -64,7 +65,8 @@ router.post('/login', (req, res) => {
                     userdata = {
                         id: results[0].userID,
                         name: results[0].name,
-                        email: results[0].email
+                        email: results[0].email,
+                        currency : results[0].defaultcurrency
                     }
                     req.session.user = email;
                     res.status(200).send(JSON.stringify(userdata));

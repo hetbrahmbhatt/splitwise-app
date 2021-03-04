@@ -4,6 +4,7 @@ var express = require( 'express' );
 var session = require( "express-session" );
 var user = require( './user/routes')
 var groups = require( './groups/routes')
+var expense = require( './expense/routes')
 
 var bodyParser = require( 'body-parser' );
 var mysql = require( 'mysql');
@@ -58,6 +59,7 @@ app.listen( PORT, () => {
 
 app.use( '/users', user );
 app.use( '/groups', groups );
+app.use( '/expense', expense );
 
 
 app.get( '/', ( req, res ) => {

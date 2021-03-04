@@ -79,7 +79,6 @@ router.post('/recentactivitybygroups/', (req, res) => {
         sql = `SELECT mu.name as username,me.amount,me.createdat,me.ref_paidby,me.currency,mg.name,mg.groupid,mg.count,me.description,mg.image FROM splitwise.master_expense as me inner join users as mu on mu.userid = me.ref_paidby inner join master_group as mg on me.ref_groupid = mg.groupid where ref_groupid IN (select m.ref_groupid from members as m  inner join master_group as me on m.ref_groupid = me.groupid where status=2 and m.ref_userid = ${userID} ) order by createdat ${orderBy};`;
     else
         sql = `SELECT mu.name as username,me.amount,me.createdat,me.ref_paidby,me.currency,mg.name,mg.groupid,mg.count,me.description,mg.image FROM splitwise.master_expense as me inner join users as mu on mu.userid = me.ref_paidby inner join master_group as mg on me.ref_groupid = mg.groupid where ref_groupid IN (select m.ref_groupid from members as m  inner join master_group as me on m.ref_groupid = me.groupid where status=2 and m.ref_userid = ${userID} and groupid = ${groupID} ) order by createdat ${orderBy};`;
-    // var sql = `select mg.groupid,mg.name from master_group as mg inner join members as me on mg.groupid = me.ref_groupid where status = 2 and me.ref_userid = ${userID};`;
     connection.query(sql, (err, results) => {
         if (err) {
 
@@ -152,7 +151,6 @@ router.put('/updategroup/', (req, res) => {
             res.status(400).end("Error in updating, Please contact database administrator.");
         }
         else {
-            console.log("Here");
             res.status(200).send(JSON.stringify(results));
 
         }
@@ -309,6 +307,20 @@ router.get('/recentactivity/:id', (req, res) => {
         }
     });
 });
+router.post('/totalbalance/:id', async (req, res) => {
+    userID = req.params.id;
+    var sql = `select CONCAT(currency, sum(groupbalance)) as groupBalance from recent_activity where ref_userid = ${userID} group by currency;`;
+    await connection.query(sql, (err, sqlresults) => {
+        if(sql){
+
+        }
+        else{
+
+        }
+    });
+
+
+});
 router.post('/individualexpense/:id', async (req, res) => {
     console.log(req.body);
     console.log(req.params.id);
@@ -353,11 +365,12 @@ router.post('/individualexpense/:id', async (req, res) => {
                     //         x.set(results[i].ref_userid, results[i].name + " gets back " + sqlresults[j]['currency'] + sqlresults[j]['sum(groupbalance)'] );
                     //     }
                     // }
+                    
                 }
-                res.write(result);
             }
         });
     }
+    console.log(result);
 });
 
 router.get('/individualdata/:id', async (req, res) => {
@@ -444,6 +457,8 @@ router.post('/expenses', (req, res) => {
                                     else {
                                         groupBalance = -(dividedAmount);
                                     }
+                                    console.log("--------------.")
+                                    console.log(results[0]);
                                     var oldgBalance = results[0].groupbalance;
                                     var newgBalance = parseFloat(Number(oldgBalance) + Number(groupBalance));
                                     console.log(newgBalance);
@@ -468,7 +483,7 @@ router.post('/expenses', (req, res) => {
                                     else {
                                         groupBalance = -(dividedAmount);
                                     }
-                                    var values = [ref_expenseid, group_members2[i], amount, groupID, currency, groupBalance, groupBalance, timestamp, null];
+                                    var values = [ref_expenseid, group_members2[i], amount, groupID, req.body.currency, groupBalance, groupBalance, timestamp, null];
                                     var sql = `insert into recent_activity(ref_expenseid,ref_userid,amount,ref_groupid,currency,groupbalance,totalbalance,createdat,updatedat) values(?,?,?,?,?,?,?,?,?);`
                                     connection.query(sql, values, (err, results, fields) => {
                                         if (err) {
