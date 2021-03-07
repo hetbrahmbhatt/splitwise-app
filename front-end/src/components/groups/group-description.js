@@ -9,6 +9,7 @@ import AddExpense from './add-expense'
 import moment from 'moment';
 import grocerylogo from '../../images/grocery.png'
 import camera from '../../images/camera.png'
+import emptyplaceholder from '../../images/empty-placeholder.png'
 
 const customStyles = {
     content: {
@@ -39,12 +40,12 @@ export class GroupDescription extends Component {
                     error: false,
                     errorMessage: "",
                     groupPopUp: false,
-                    groupDescription: []
+                    groupDescription: [],
+                    emptyStateFlag: false
 
                 }
             }
             else {
-                console.log("object")
                 this.state = {
                     groupID: this.props.location.state.groupData.groupID,
                     groupName: this.props.location.state.groupData.groupName,
@@ -54,7 +55,8 @@ export class GroupDescription extends Component {
                     error: false,
                     errorMessage: "",
                     groupPopUp: false,
-                    groupDescription: []
+                    groupDescription: [],
+                    emptyStateFlag : false
                 }
             }
         }
@@ -63,6 +65,13 @@ export class GroupDescription extends Component {
         const groupID = this.state.groupID;
         const response = await axios.get(BACKEND_URL + "/groups/description/" + groupID);
         console.log(response.data);
+        if(response.data.length == 0){
+            if (response.data.length == 0) {
+                this.setState({
+                    emptyStateFlag: true
+                })
+            }
+        }
         response.data.map((groupDescription) => {
             this.setState({
                 groupDescription: [...this.state.groupDescription, groupDescription]
@@ -70,7 +79,7 @@ export class GroupDescription extends Component {
         })
         const individualData = await axios.get(BACKEND_URL + "/groups/individualdata/" + groupID);
         // console.log(individualData.data);
-        const individualExpense = await axios.post(BACKEND_URL + "/groups/individualexpense/" + groupID,individualData.data);
+        const individualExpense = await axios.post(BACKEND_URL + "/groups/individualexpense/" + groupID, individualData.data);
         // console.log(individualExpense.data);
         // console.log(this.state);
     }
@@ -81,42 +90,86 @@ export class GroupDescription extends Component {
     }
 
     render() {
-        
+
+        let groupDescriptionDetails = null;
         let redirectVar = null
         if (!cookie.load("auth")) {
             redirectVar = <Redirect to="/login" />
         }
-        let groupDescriptionDetails = this.state.groupDescription.map((group, index) => {
-            return (
-                <div className="row" style={{ height: "100px", borderBottom: "0.01px solid lightgrey", borderLeft: "0.01px solid lightgrey", borderRight: "0.01px solid lightgrey", borderWidth: "thin", marginBottom: "1px" }}>
-                    <div className="col-1" style={{ margin: "20px", color: "grey" }}>
-                        <div className="row">
-                            {moment(group.createdat).format("MMM")}
-                        </div>
-                        <div className="row" style={{ fontSize: "30px", marginTop: "-10px" }}>
-                            {moment(group.createdat).format("D")}
-                        </div>
-                    </div>
-                    <div className="col-2">
-                        <img src={grocerylogo} style={{ "paddingLeft": "0%", marginLeft: "-20px", marginTop: "20px" }} width="60%" height="60%" alt="" />
-                    </div>
-                    <div className="col-6" style={{ marginLeft: "-60px", marginTop: "30px" }}>
-                        <div className="row">
-                            <h3>{group.description}</h3>
-                            <img src={camera} style={{ margin: "8px" }} width="20px" height="20px" alt="" />
-                        </div>
-                    </div>
-                    <div className="col-3" style={{ marginLeft: "60px", marginTop: "15px", marginRight: "-40px" }}>
-                        <div className="row" style={{color : "grey"}}>
-                            {group.name}
-                        </div>
-                        <div className="row">
-                            <h3><b>{group.currency}{group.amount}</b></h3>
-                        </div>
-                    </div>
+        if (this.state.emptyStateFlag) {
+            groupDescriptionDetails = (
+                <div style={{ margin: "200px" }}>
+                    <img src={emptyplaceholder} width="300px" height="200px" alt="" />
+                    <h4 style={{ font: "Bookman" }}>Sorry, no activities yet to display!!</h4>
                 </div>
             )
-        })
+        }
+        else {
+            groupDescriptionDetails = this.state.groupDescription.map((group, index) => {
+                if (group.settleFlag == 0) {
+                    return (
+                        <div className="row" style={{ height: "100px", borderBottom: "0.01px solid lightgrey", borderLeft: "0.01px solid lightgrey", borderRight: "0.01px solid lightgrey", borderWidth: "thin", marginBottom: "1px" }}>
+                            <div className="col-1" style={{ margin: "20px", color: "grey" }}>
+                                <div className="row">
+                                    {moment(group.createdat).format("MMM")}
+                                </div>
+                                <div className="row" style={{ fontSize: "30px", marginTop: "-10px" }}>
+                                    {moment(group.createdat).format("D")}
+                                </div>
+                            </div>
+                            <div className="col-2">
+                                <img src={grocerylogo} style={{ "paddingLeft": "0%", marginLeft: "-20px", marginTop: "20px" }} width="60%" height="60%" alt="" />
+                            </div>
+                            <div className="col-6" style={{ marginLeft: "-60px", marginTop: "30px" }}>
+                                <div className="row">
+                                    <h3>{group.description}</h3>
+                                    <img src={camera} style={{ margin: "8px" }} width="20px" height="20px" alt="" />
+                                </div>
+                            </div>
+                            <div className="col-3" style={{ marginLeft: "60px", marginTop: "15px", marginRight: "-40px" }}>
+                                <div className="row" style={{ color: "grey" }}>
+                                    {group.name}
+                                </div>
+                                <div className="row">
+                                    <h3><b>{group.currency}{group.amount}</b></h3>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
+                else {
+                    return (
+                        <div className="row" style={{ height: "100px", borderBottom: "0.01px solid lightgrey", borderLeft: "0.01px solid lightgrey", borderRight: "0.01px solid lightgrey", borderWidth: "thin", marginBottom: "1px" }}>
+                            <div className="col-1" style={{ margin: "20px", color: "grey" }}>
+                                <div className="row">
+                                    {moment(group.createdat).format("MMM")}
+                                </div>
+                                <div className="row" style={{ fontSize: "30px", marginTop: "-10px" }}>
+                                    {moment(group.createdat).format("D")}
+                                </div>
+                            </div>
+                            <div className="col-2">
+                                <img src={grocerylogo} style={{ "paddingLeft": "0%", marginLeft: "-20px", marginTop: "20px" }} width="60%" height="60%" alt="" />
+                            </div>
+                            <div className="col-6" style={{ marginLeft: "-60px", marginTop: "30px" }}>
+                                <div className="row">
+                                    <h4><b>"{group.name}"</b> and <b>"{group.settlename}"</b>settled up.</h4>
+                                </div>
+                            </div>
+                            <div className="col-3" style={{ marginLeft: "60px", marginTop: "15px", marginRight: "-40px" }}>
+                                <div className="row" style={{ color: "grey", maxWidth: "20" }}>
+                                    <h6>dues cleared worth </h6>
+                                </div>
+                                <div className="row" >
+                                    <h3><b>{group.currency}{group.amount}</b></h3>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
+
+            })
+        }
         return (
             <div>
                 {redirectVar}
@@ -131,7 +184,7 @@ export class GroupDescription extends Component {
                                 <button type="submit" className="btn btn-amber" onClick={this.toggleGroupPopUp} style={{ marginLeft: "70px", marginTop: "25px", height: "40px", width: "250px", backgroundColor: "#FF7F50", color: "white" }} >Add an Expense</button>
                                 <div style={{ height: "200px" }}>
                                     <Modal style={customStyles} isOpen={this.state.groupPopUp} ariaHideApp={false}>
-                                        <AddExpense groupData={this.state} closePopUp={this.toggleGroupPopUp}/>
+                                        <AddExpense groupData={this.state} closePopUp={this.toggleGroupPopUp} />
                                     </Modal>
                                 </div>
 

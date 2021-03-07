@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
-import { toast } from "react-toastify";
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import cookie from "react-cookies";
-import BACKEND_URL from '../../config/config'
+import { connect } from "react-redux";
+import { Redirect } from 'react-router';
 import splitwiselogo from '../../images/splitwise-logo.png'
+// Importing the login action
+import loginAction from '../../actions/login-action'
+
+
 
 export class login extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            type: '',
             email: '',
             password: '',
             error: false,
@@ -60,68 +62,23 @@ export class login extends Component {
     handleSubmit = e => {
         e.preventDefault();
         if (!this.state.error) {
-            axios
-                .post(BACKEND_URL + '/users/login', this.state)
-                .then((response) => {
-                    console.log(response);
-                    if (response.status === 200) {
-                        this.setState({
-                            error: false
-                        })
-                        cookie.save("auth", true, {
-                            path: '/',
-                            httpOnly: false,
-                            maxAge: 90000
-                        })
-                        cookie.save("id", response.data.id, {
-                            path: '/',
-                            httpOnly: false,
-                            maxAge: 90000
-                        })
-                        cookie.save("name", response.data.name, {
-                            path: '/',
-                            httpOnly: false,
-                            maxAge: 90000
-                        })
-                        cookie.save("email", response.data.email, {
-                            path: '/',
-                            httpOnly: false,
-                            maxAge: 90000
-                        })
-                        cookie.save("defaultcurrency", response.data.currency, {
-                            path: '/',
-                            httpOnly: false,
-                            maxAge: 90000
-                        })
-                        cookie.save("timezone", " ", {
-                            path: '/',
-                            httpOnly: false,
-                            maxAge: 90000
-                        })
-
-                        toast.error("Successfully logged in")
-                        window.location.assign('/dashboard');
-                    }
-                })
-                .catch((err) => {
-                    this.setState({
-                        error: true,
-                        errorMessage: "Invalid Credentials"
-                    })
-
-                });
+            this.props.loginAction( this.state )
         };
     }
 
 
     render() {
         let renderError = null
+        let redirectVar = null
+        if ( cookie.load( 'auth' )) {
+            redirectVar = <Redirect to='/dashboard' />
+        }
         if (this.state.error) {
             renderError = <div style={{ 'color': 'red' }}>{this.state.errorMessage}</div>
         }
         return (
             <div style={{ "marginLeft": "30%", "margin-top": "-40px" }}>
-
+                {redirectVar}
                 <div className="row" style={{ height: "100vh", "padding": "10%" }}>
 
                     <div className="col-5" style={{ "paddingLeft": "10%" }}>
@@ -167,5 +124,19 @@ export class login extends Component {
         )
     }
 }
+const matchStateToProps = ( state ) => {
+    console.log( "inside matchStatetoProps", state )
+    return {
+        error: state.loginReducer.error,
+        message: state.loginReducer.message
+    }
 
-export default login
+}
+
+const matchDispatchToProps = ( dispatch ) => {
+    return {
+        loginAction: ( data ) => dispatch( loginAction( data ) ),
+    }
+}
+
+export default connect( matchStateToProps, matchDispatchToProps )(login )

@@ -88,7 +88,7 @@ export class NewGroup extends Component {
                 .post(BACKEND_URL + "/groups/new", this.state).then(response => {
                     if (response.status === 200) {
                         toast.success("Group Created Successfully");
-                        window.location.assign("/users/dashboard");
+                        window.location.assign("/dashboard");
                         const formData = new FormData();
                         formData.append('profileImage', this.state.updatedProfileImage, this.state.updatedProfileImage.name + "," + response.data.groupID)
                         const config = {

@@ -8,7 +8,6 @@ import moment from 'moment';
 import Select from 'react-select';
 
 export class RecentActivity extends Component {
-
     constructor(props) {
         super(props);
 
@@ -145,6 +144,7 @@ export class RecentActivity extends Component {
         window.location.reload();
     };
     render() {
+        console.log(this.state);
         let orderByOptions = [
             { value: 'DESC', label: 'Descending' },
             { value: 'ASC', label: 'Ascending' },
@@ -152,7 +152,6 @@ export class RecentActivity extends Component {
         let groupOptions = this.state.groups.map(function (group) {
             return { value: group.groupid, label: group.name };
         })
-        console.log(this.state);
         let recentactivityDetails = null;
         if (this.state.emptyStateFlag) {
             recentactivityDetails = (
@@ -168,73 +167,92 @@ export class RecentActivity extends Component {
                 let groupDivision = null;
                 let groupPayingDivision = null;
                 let amount = group.amount / group.count;
-
-                if (group.ref_paidby == cookie.load('id')) {
-                    groupDivision = <p style={{ fontSize: "20px" }}><b>You</b> updated <b>"{group.description}"</b> in <b>"{group.name}".</b></p>
-                    groupPayingDivision = <div style={{ 'color': '#20BF9F', fontSize: "18px" }}><b>You get back {group.currency} {amount}</b></div>
+                amount = amount.toFixed(2);
+                let getAmount = 0;
+                if (group.count == 2) {
+                    getAmount = amount / 2;
+                }
+                else if (group.count == 1) {
+                    getAmount = amount;
+                }
+                else {
+                    getAmount = (group.count - 1) * amount;
+                }
+                getAmount = Number(getAmount).toFixed(2);
+                if (Number(group.settleFlag) > 0) {
+                    groupDivision = <p style={{ fontSize: "20px" }}><b>"{group.username}"</b> and <b>"{group.settlename}"</b> settled up in <b>"{group.name}"</b></p>
+                    groupPayingDivision = <div style={{ 'color': '#20BF9F', fontSize: "18px" }}><b> {group.currency} dues cleared  </b></div>
 
                 }
                 else {
-                    groupDivision = <p style={{ fontSize: "18px" }}><b>"{group.username}"</b> added <b>"{group.description}"</b> in <b>"{group.name}".</b></p>
-                    groupPayingDivision = <div style={{ 'color': '#FF8C00', fontSize: "18px" }}><b>You owe {group.currency} {amount}</b></div>
+                    if (group.ref_paidby == cookie.load('id')) {
 
+                        groupDivision = <p style={{ fontSize: "20px" }}><b>You</b> updated <b>"{group.description}"</b> in <b>"{group.name}". </b></p>
+                        groupPayingDivision = <div style={{ 'color': '#20BF9F', fontSize: "18px" }}><b>You get back {group.currency} {getAmount}</b></div>
+
+                    }
+                    else {
+                        groupDivision = <p style={{ fontSize: "18px" }}><b>"{group.username}"</b> added <b>"{group.description}"</b> in <b>"{group.name}".</b></p>
+                        groupPayingDivision = <div style={{ 'color': '#FF8C00', fontSize: "18px" }}><b>You owe {group.currency} {amount}</b></div>
+
+                    }
                 }
-                return (
-                    <div>
-                        <div className="row" className="row" style={{ height: "100px", borderBottom: "0.01px solid lightgrey", borderLeft: "0.01px solid lightgrey", borderRight: "0.01px solid lightgrey", borderWidth: "thin", marginLeft: "-14px" }}>
-                            <div className="col-2">
-                                <img src={grocerylogo} style={{ "paddingLeft": "0%", marginLeft: "10px", marginTop: "20px" }} width="60%" height="60%" alt="" />
 
-                            </div>
-                            <div className="col-9" style={{ marginTop: "20px", marginLeft: "5px", zIndex: "100", position: "relative" }}>
-                                {/* <p style={{fontSize: "18px"}}><b>"{group.username}"</b> added <b>"{group.description}"</b> in <b>"{group.name}"</b></p> */}
-                                {groupDivision}
-                                <div style={{ marginTop: "-15px", color: "grey" }}>
-                                    {groupPayingDivision}
-                                    {moment(group.createdat).format("MMM")}
-                                    {' '}
-                                    {moment(group.createdat).format("D")}
+    return(
+    <div>
+    <div className="row" className="row" style={{ height: "100px", borderBottom: "0.01px solid lightgrey", borderLeft: "0.01px solid lightgrey", borderRight: "0.01px solid lightgrey", borderWidth: "thin", marginLeft: "-14px" }}>
+        <div className="col-2">
+            <img src={grocerylogo} style={{ "paddingLeft": "0%", marginLeft: "10px", marginTop: "20px" }} width="60%" height="60%" alt="" />
+        </div>
+        <div className="col-9" style={{ marginTop: "20px", marginLeft: "5px", zIndex: "100", position: "relative" }}>
+            {/* <p style={{fontSize: "18px"}}><b>"{group.username}"</b> added <b>"{group.description}"</b> in <b>"{group.name}"</b></p> */}
+            {groupDivision}
+            <div style={{ marginTop: "-15px", color: "grey" }}>
+                {groupPayingDivision}
+                {moment(group.createdat).format("MMM")}
+                {' '}
+                {moment(group.createdat).format("D")}
 
-                                </div>
+            </div>
 
-                            </div>
-                        </div>
+        </div>
+    </div>
 
-                    </div>
-                )
+    </div >
+)
             });
         }
-        return (
-            <div className="row">
-                <div className="col-3 p-1 m-3">
-                    <Select
-                        style={{ width: "300px", marginLeft: "-30px" }}
-                        name="form-field-name"
-                        onChange={this.handleChange}
-                        labelKey='name'
-                        valueKey='groupid'
-                        placeholder="Select a particular group for recent activities"
-                        options={groupOptions}
-                    />
-                    <Select
-                        style={{ width: "400px", marginLeft: "-30px" }}
-                        name="form-field-name"
-                        onChange={this.handleOrderByChange}
-                        placeholder="Select Order by"
-                        options={orderByOptions}
-                    />
-                    <button class="btn btn-info" style={{ marginLeft: "100px", marginTop: "20px",backgroundColor : "#20BF9F" }} onClick={this.onClear}>Clear Value</button>
+return (
+    <div className="row">
+        <div className="col-3 p-1 m-3">
+            <Select
+                style={{ width: "300px", marginLeft: "-30px" }}
+                name="form-field-name"
+                onChange={this.handleChange}
+                labelKey='name'
+                valueKey='groupid'
+                placeholder="Select a particular group for recent activities"
+                options={groupOptions}
+            />
+            <Select
+                style={{ width: "400px", marginLeft: "-30px" }}
+                name="form-field-name"
+                onChange={this.handleOrderByChange}
+                placeholder="Select Order by"
+                options={orderByOptions}
+            />
+            <button class="btn btn-info" style={{ marginLeft: "100px", marginTop: "20px", backgroundColor: "#20BF9F" }} onClick={this.onClear}>Clear Value</button>
 
-                </div>
-                <div className="col-6">
+        </div>
+        <div className="col-6">
 
-                    <div className="row" style={{ height: "80px", backgroundColor: "whitesmoke" }}>
-                        <strong style={{ margin: "20px", fontSize: "30px" }}>Recent Activity</strong>
-                    </div>
-                    {recentactivityDetails}
-                </div>
+            <div className="row" style={{ height: "80px", backgroundColor: "whitesmoke" }}>
+                <strong style={{ margin: "20px", fontSize: "30px" }}>Recent Activity</strong>
             </div>
-        )
+            {recentactivityDetails}
+        </div>
+    </div>
+)
     }
 }
 

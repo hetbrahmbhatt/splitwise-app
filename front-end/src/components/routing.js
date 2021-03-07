@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router-dom';
 import landingPage  from './landing-page/landing-page';
-import  signup  from './sign-up/sign-up';
+import signup  from './sign-up/sign-up';
 import login from './login/login'
 import logout from './login/logout';
 import Navbar from './landing-page/navbar';

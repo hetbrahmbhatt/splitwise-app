@@ -11,15 +11,15 @@ export class AddExpense extends Component {
     constructor(props) {
         super(props);
         if (this.props.groupData.groupImagePath == null) {
-            console.log("object")
             this.state = {
                 groupID: this.props.groupData.groupID,
                 groupName: this.props.groupData.groupName,
                 groupImagePath: BACKEND_URL + '/images/avatar.png',
-                currency : cookie.load('defaultcurrency'),
-                userID : cookie.load('id'),
+                currency: cookie.load('defaultcurrency'),
+                userID: cookie.load('id'),
                 description: "",
-                amount : ""
+                amount: "",
+                amountFlag: false
             }
         }
         else {
@@ -27,16 +27,23 @@ export class AddExpense extends Component {
                 groupID: this.props.groupData.groupID,
                 groupName: this.props.groupData.groupName,
                 groupImagePath: this.props.groupData.groupImagePath,
-                currency : cookie.load('defaultcurrency'),
-                userID : cookie.load('id'),
+                currency: cookie.load('defaultcurrency'),
+                userID: cookie.load('id'),
                 description: "",
-                amount : ""
+                amount: "",
+                amountFlag: false
             }
         }
     }
     handleInputChange = inp => {
+        if (inp.target.value < 0) {
+            this.setState({
+                amountFlag: true
+            })
+        }
         {
             this.setState({
+                amountFlag : false,
                 [inp.target.name]: inp.target.value
             })
         }
@@ -48,26 +55,31 @@ export class AddExpense extends Component {
             return;
         }
         var currency = {
-            currency : cookie.load("defaultcurrency")
+            currency: cookie.load("defaultcurrency")
         };
-        axios
-            .post(BACKEND_URL + "/groups/expenses",this.state).then(response => {
-                if (response.status === 200) {
-                    window.location.reload();
-                    toast.success("Group Updated Successfully");
-                    //window.location.assign("/users/dashboard")
-                }
-            }).catch(err => {
-                if (err.response == null) {
+        if (!this.state.amountFlag) {
+            axios
+                .post(BACKEND_URL + "/groups/expenses", this.state).then(response => {
+                    if (response.status === 200) {
+                        window.location.reload();
+                        toast.success("Group Updated Successfully");
+                    }
+                }).catch(err => {
+                    if (err.response == null) {
 
-                }
-                else {
+                    }
+                    else {
 
-                }
-                // toast.error(err.response.data);
-            })
+                    }
+                    // toast.error(err.response.data);
+                })
+        }
     }
     render() {
+        let renderError = null;
+        if (this.state.amountFlag) {
+            renderError = <span style={{ marginTop: '-220px', color: "red" }}>Please enter positive value</span>
+        }
         return (
             <div>
                 <div class="container">
@@ -101,15 +113,19 @@ export class AddExpense extends Component {
                             <form onSubmit={this.handleSubmit} id="Login">
                                 <input placeholder="Enter Description" type="text" id="description" name="description" style={{ border: "0", borderBottom: "2px dotted" }} onChange={this.handleInputChange} ></input>
                                 <div className="row">
-                                    <input value={cookie.load('defaultcurrency')} size="1" style={{ marginTop: "10px", marginLeft: "20px", marginRight: "5px", border: "0", marginBottom: "-13px" }}></input>  <input placeholder="0.00" type="text" size="17" id="amount" name="amount" style={{ border: "0", borderBottom: "2px dotted", marginTop: "20px" }} onChange={this.handleInputChange} ></input>
+                                    <input value={cookie.load('defaultcurrency')} size="4" style={{ marginTop: "10px", marginLeft: "20px", marginRight: "5px", border: "0", marginBottom: "-13px" }}></input>  <input placeholder="0.00" type="number" size="7" id="amount" name="amount" style={{ border: "0", borderBottom: "2px dotted", marginTop: "20px", marginLeft: "20px" }} onChange={this.handleInputChange} ></input>
                                 </div>
                                 <button type="submit" className="btn btn-amber" style={{ "backgroundColor": "#20BF9F", "marginTop": "150px", "marginLeft": "10px" }} onSubmit={this.handleSubmit}>Save</button>
-                                <button className="btn btn-danger" style={{"marginLeft" : "10px","marginTop" : "150px"}}onClick={ this.props.closePopUp }>Back</button>
+                                <button className="btn btn-danger" style={{ "marginLeft": "10px", "marginTop": "150px" }} onClick={this.props.closePopUp}>Back</button>
                             </form>
                         </div>
                     </div>
+                    {renderError}
+
                 </div>
+
             </div>
+
         )
     }
 }

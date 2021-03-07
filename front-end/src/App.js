@@ -4,17 +4,25 @@ import Routing from './components/routing';
 import { BrowserRouter } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Provider } from 'react-redux';
+import { withRouter } from "react-router-dom";
+import Navbar from './components/landing-page/navbar';
+import store from './store'
 function App() {
   return (
-    <BrowserRouter>
-      <div>
-        <Routing />
+    <Provider store={store}>
 
-      </div>
-      <ToastContainer />
+      <BrowserRouter>
+        <div>
 
-    </BrowserRouter>
-    
+          <Routing />
+
+        </div>
+        <ToastContainer />
+
+      </BrowserRouter>
+    </Provider>
+
   );
 }
 
