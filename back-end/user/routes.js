@@ -51,6 +51,8 @@ router.post('/signup', (req, res) => {
 
 //login
 router.post('/login', (req, res) => {
+    console.log("cswefcfccepdpepeppeppepeep")
+    console.log(req.body);
     var email = req.body.email
     var password = req.body.password
     var sql = `select userID,name,email,password,defaultcurrency from users where email="${email}"`;

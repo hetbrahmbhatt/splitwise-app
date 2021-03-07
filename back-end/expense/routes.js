@@ -57,7 +57,9 @@ router.get('/totalowing/:id', (req, res) => {
     var userID = req.params.id;
     console.log(userID);
     var result = []
-    var sql = `select u.userid as from_user,u2.userid as to_user,concat(u2.name," owes ",u.name," ",concat(d.currency,-1*d.amount))as string,mg.name from debt as d inner join users as u on userid1 = userid inner join users as u2 on d.userid2 = u2.userid  inner join master_group as mg on d.ref_groupid = mg.groupid where (userid1=${userID}) and d.amount<0;`;
+    var sql = `select d.userid1,d.userid2,d.ref_groupid,concat(u.name,"  owes you ") as totalOwe,concat(d.currency,-1*d.amount) as tamount,mg.name,d.currency,u.image,d.amount from debt as d inner join users as u on d.userid2 = u.userid inner join master_group as mg on d.ref_groupid=mg.groupid where d.userid1 = ${userID} and amount <0 
+    UNION ALL
+    select d.userid1,d.userid2,d.ref_groupid,concat(u.name,"  owes you ") as totalOwe, concat(d.currency, d.amount) as tamount,mg.name,d.currency,u.image,d.amount  from debt as d inner join users as u on d.userid1 = u.userid inner join master_group as mg on d.ref_groupid = mg.groupid where d.userid2 = ${userID} and amount > 0;`;
     connection.query(sql, (err, results) => {
         if (err) {
             console.log(err);
@@ -70,9 +72,11 @@ router.get('/totalowing/:id', (req, res) => {
 
 router.get('/totalgiving/:id', (req, res) => {
     var userID = req.params.id;
-    console.log(userID);
+    console.log("HI", userID);
     var result = []
-    var sql = `select u.userid as from_user,u2.userid as to_user,concat(u2.name," owes ",u.name," ",concat(d.currency,d.amount))as string,mg.name from debt as d inner join users as u on userid1 = userid inner join users as u2 on d.userid2 = u2.userid  inner join master_group as mg on d.ref_groupid = mg.groupid where (userid2=${userID}) and d.amount<0;`;
+    var sql = `select d.userid1,d.userid2,d.ref_groupid,concat((" you owe ") ,u.name) as totalOwe,concat(d.currency,d.amount) as amount,mg.name,d.currency,u.image,d.currency from debt as d inner join users as u on d.userid2 = u.userid inner join master_group as mg on d.ref_groupid=mg.groupid where d.userid1 = ${userID} and amount > 0 
+    UNION ALL
+    select d.userid1,d.userid2,d.ref_groupid,concat((" you owe  "),u.name )as totalOwe, concat(d.currency, -1*d.amount) as amount,mg.name,d.currency,u.image,d.currency  from debt as d inner join users as u on d.userid1 = u.userid inner join master_group as mg on d.ref_groupid = mg.groupid where d.userid2 = ${userID} and amount < 0;`;
     connection.query(sql, (err, results) => {
         if (err) {
             console.log(err);
@@ -81,6 +85,87 @@ router.get('/totalgiving/:id', (req, res) => {
             res.status(200).send(JSON.stringify(results));
         }
     });
+});
+router.post('/owingsettleup', (req, res) => {
+    console.log(req.body);
+    let dateObject = new Date(new Date());
+    let date = dateObject.getDate().toString();
+    let month = (dateObject.getMonth() + 1).toString();
+    let year = dateObject.getFullYear().toString();
+    let time = dateObject.getHours().toString() + "-" + dateObject.getMinutes().toString() + "-" + dateObject.getSeconds().toString();
+    timestamp = year + "-" + month + "-" + date + "-" + time;
+    var userid1 = null;
+    var userid2 = null;
+    var groupID = null;
+    var amountToUpdate = 0;
+    if (Number(req.body.amount) > 0) {
+        amountToUpdate = req.body.amount;
+    }
+    else {
+        amountToUpdate = -1 * (req.body.amount);
+
+    }
+    var sessionID = Number(req.body.sessionID);
+    console.log(Number(sessionID));
+    console.log(req.body);
+    if (Number(req.body.userid1) < req.body.userid2) {
+        userid1 = req.body.userid1;
+        userid2 = req.body.userid2
+    } else {
+        userid1 = req.body.userid2;
+        userid2 = req.body.userid1;
+    }
+    console.log(userid1);
+    console.log(userid2);
+    var anotherid = null;
+    if (sessionID == userid1) {
+        anotherid = userid2
+    }
+    else {
+        anotherid = userid1;
+    }
+    console.log(req.body.ref_groupid);
+    console.log(amountToUpdate);
+
+    var sql = `update debt set amount=0,currency=null where userid1 = ${userid1} and userid2 = ${userid2} and ref_groupid = ${req.body.ref_groupid} and currency ='${req.body.currency}';`;
+    connection.query(sql, (err, results) => {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            var sql = `insert into master_expense(ref_groupid,ref_paidby,settleFlag,currency,createdat) values(?,?,?,?,?);`
+            var values = [req.body.ref_groupid, userid1, userid2, req.body.tamount,timestamp];
+            connection.query(sql, values, (err, results) => {
+                if (err) {
+                    console.log(err);
+                }
+                else {
+                    var sql = `insert into recent_activity(ref_expenseid,ref_userid,ref_groupid,createdat) values(?,?,?,?);`
+                    var values = [results.insertId, sessionID, req.body.ref_groupid,timestamp];
+                    connection.query(sql, values, (err, results) => {
+                        if (err) {
+                            console.log(err);
+                        }
+                        else {
+                            console.log("Over here");
+                            var sql = ` update recent_activity set groupbalance = groupbalance - ${amountToUpdate} where ref_userid = ${sessionID} and currency = '${req.body.currency}' and ref_groupid=${req.body.ref_groupid};update recent_activity set groupbalance = groupbalance + ${amountToUpdate} where ref_userid = ${anotherid} and currency = '${req.body.currency}' and ref_groupid=${req.body.ref_groupid}`;
+                            connection.query(sql, (err, results) => {
+                                if (err) {
+                                    console.log(err);
+                                }
+                                else {
+                                    console.log("here");
+                                    res.end();
+                                }
+                            });
+
+                        }
+                    });
+                }
+            });
+        }
+    });
+
 });
 module.exports = router;
 //

@@ -93,8 +93,8 @@ router.post('/recentactivitybygroups/', (req, res) => {
 router.get('/description/:id', (req, res) => {
     var groupID = req.params.id;
 
-    var sql = `select me.description,u.name,me.amount,me.createdat,me.currency from master_expense me inner join users  u on u.userid = me.ref_paidby where ref_groupid = ${groupID} order by createdat desc`;
-
+    var sql = `select me.description,u.name,me.amount,me.createdat,me.currency,me.settleFlag,u2.name as settlename from master_expense me inner join users  u on u.userid = me.ref_paidby left join users u2 on u2.userid = me.settleFlag where ref_groupid = ${groupID} order by createdat desc`;
+ 
     connection.query(sql, (err, results) => {
         if (err) {
             console.log(err);
@@ -296,7 +296,7 @@ router.post('/leavegroup', (req, res) => {
 });
 router.get('/recentactivity/:id', (req, res) => {
     var userID = req.params.id;
-    var sql = `SELECT mu.name as username,me.amount,me.createdat,me.ref_paidby,me.currency,mg.name,mg.groupid,mg.count,me.description,mg.image FROM splitwise.master_expense as me inner join users as mu on mu.userid = me.ref_paidby inner join master_group as mg on me.ref_groupid = mg.groupid where ref_groupid IN (select m.ref_groupid from members as m  inner join master_group as me on m.ref_groupid = me.groupid where status=2 and m.ref_userid = ${userID}) order by createdat desc;`;
+    var sql = `SELECT mu.name as username,mu2.name as settlename,me.amount,me.createdat,me.settleFlag,me.ref_paidby,me.currency,mg.name,mg.groupid,mg.count,me.description,mg.image FROM splitwise.master_expense as me inner join users as mu on mu.userid = me.ref_paidby inner join master_group as mg on me.ref_groupid = mg.groupid left join users as mu2 on mu2.userid = me.settleFlag where ref_groupid IN (select m.ref_groupid from members as m  inner join master_group as me on m.ref_groupid = me.groupid  where status=2 and m.ref_userid = ${userID} ) order by createdat desc;`;
     connection.query(sql, (err, results) => {
         if (err) {
             res.send(400).end("Sorry! Nothing to display");
