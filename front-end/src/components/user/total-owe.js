@@ -23,6 +23,12 @@ export class TotalOwe extends Component {
     handleSubmit = e => {
         e.preventDefault();
         axios.post(BACKEND_URL + "/expense/owingsettleup", this.state).then(response => {
+            if(response){
+                
+            }
+            else{
+
+            }
         });
 
         console.log(this.state);

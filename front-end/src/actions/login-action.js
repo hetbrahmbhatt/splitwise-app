@@ -57,7 +57,7 @@ var loginAction = (data) => (dispatch) => {
                     httpOnly: false,
                     maxAge: 90000
                 })
-                cookie.save("timezone", "UTC", {
+                cookie.save("timezone", "American/Los_Angeles", {
                     path: '/',
                     httpOnly: false,
                     maxAge: 90000

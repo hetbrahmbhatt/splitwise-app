@@ -4,7 +4,7 @@ import BACKEND_URL from '../../config/config';
 import axios from 'axios';
 import grocerylogo from '../../images/grocery.png'
 import emptyplaceholder from '../../images/empty-placeholder.png'
-import moment from 'moment';
+import moment from 'moment-timezone';
 import Select from 'react-select';
 
 export class RecentActivity extends Component {
@@ -198,61 +198,57 @@ export class RecentActivity extends Component {
                     }
                 }
 
-    return(
-    <div>
-    <div className="row" className="row" style={{ height: "100px", borderBottom: "0.01px solid lightgrey", borderLeft: "0.01px solid lightgrey", borderRight: "0.01px solid lightgrey", borderWidth: "thin", marginLeft: "-14px" }}>
-        <div className="col-2">
-            <img src={grocerylogo} style={{ "paddingLeft": "0%", marginLeft: "10px", marginTop: "20px" }} width="60%" height="60%" alt="" />
-        </div>
-        <div className="col-9" style={{ marginTop: "20px", marginLeft: "5px", zIndex: "100", position: "relative" }}>
-            {/* <p style={{fontSize: "18px"}}><b>"{group.username}"</b> added <b>"{group.description}"</b> in <b>"{group.name}"</b></p> */}
-            {groupDivision}
-            <div style={{ marginTop: "-15px", color: "grey" }}>
-                {groupPayingDivision}
-                {moment(group.createdat).format("MMM")}
-                {' '}
-                {moment(group.createdat).format("D")}
-
-            </div>
-
-        </div>
-    </div>
-
-    </div >
-)
+                return (
+                    <div>
+                        <div className="row" className="row" style={{ height: "100px", borderBottom: "0.01px solid lightgrey", borderLeft: "0.01px solid lightgrey", borderRight: "0.01px solid lightgrey", borderWidth: "thin", marginLeft: "-14px" }}>
+                            <div className="col-2">
+                                <img src={grocerylogo} style={{ "paddingLeft": "0%", marginLeft: "10px", marginTop: "20px" }} width="60%" height="60%" alt="" />
+                            </div>
+                            <div className="col-8" style={{ marginTop: "20px", marginLeft: "5px", zIndex: "100", position: "relative" }}>
+                                {groupDivision}
+                                <div style={{ marginTop: "-15px", color: "grey" }}>
+                                    {groupPayingDivision}
+                                    {moment(group.createdat).tz(cookie.load("timezone")).format("MMM")}
+                                    {' '}
+                                    {moment(group.createdat).tz(cookie.load("timezone")).format("D")}
+                                </div>
+                            </div>
+                        </div>
+                    </div >
+                )
             });
         }
-return (
-    <div className="row">
-        <div className="col-3 p-1 m-3">
-            <Select
-                style={{ width: "300px", marginLeft: "-30px" }}
-                name="form-field-name"
-                onChange={this.handleChange}
-                labelKey='name'
-                valueKey='groupid'
-                placeholder="Select a particular group for recent activities"
-                options={groupOptions}
-            />
-            <Select
-                style={{ width: "400px", marginLeft: "-30px" }}
-                name="form-field-name"
-                onChange={this.handleOrderByChange}
-                placeholder="Select Order by"
-                options={orderByOptions}
-            />
-            <button class="btn btn-info" style={{ marginLeft: "100px", marginTop: "20px", backgroundColor: "#20BF9F" }} onClick={this.onClear}>Clear Value</button>
+        return (
+            <div className="row">
+                <div className="col-3 p-1 m-3">
+                    <Select
+                        style={{ width: "300px", marginLeft: "-30px" }}
+                        name="form-field-name"
+                        onChange={this.handleChange}
+                        labelKey='name'
+                        valueKey='groupid'
+                        placeholder="Select a particular group for recent activities"
+                        options={groupOptions}
+                    />
+                    <Select
+                        style={{ width: "400px", marginLeft: "-30px" }}
+                        name="form-field-name"
+                        onChange={this.handleOrderByChange}
+                        placeholder="Select Order by"
+                        options={orderByOptions}
+                    />
+                    <button class="btn btn-info" style={{ marginLeft: "100px", marginTop: "20px", backgroundColor: "#20BF9F" }} onClick={this.onClear}>Clear Value</button>
 
-        </div>
-        <div className="col-6">
+                </div>
+                <div className="col-6">
 
-            <div className="row" style={{ height: "80px", backgroundColor: "whitesmoke" }}>
-                <strong style={{ margin: "20px", fontSize: "30px" }}>Recent Activity</strong>
+                    <div className="row" style={{ height: "80px", backgroundColor: "whitesmoke" }}>
+                        <strong style={{ margin: "20px", fontSize: "30px" }}>Recent Activity</strong>
+                    </div>
+                    {recentactivityDetails}
+                </div>
             </div>
-            {recentactivityDetails}
-        </div>
-    </div>
-)
+        )
     }
 }
 

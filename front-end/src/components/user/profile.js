@@ -90,14 +90,14 @@ export class Profile extends Component {
                                 }
                             }
                             axios
-                            .post( BACKEND_URL + '/users/uploadprofileimage', formData, config ).then( ( response ) => {
-                                this.setState( {
-                                    profileImagePath: BACKEND_URL + '/images/profilepics/' + cookie.load('id') + '/' + response.data.fileName
-                
-                                } )
-                            } ).catch( err => {
-                                toast.error("Error in image upload")
-                            } )
+                                .post(BACKEND_URL + '/users/uploadprofileimage', formData, config).then((response) => {
+                                    this.setState({
+                                        profileImagePath: BACKEND_URL + '/images/profilepics/' + cookie.load('id') + '/' + response.data.fileName
+
+                                    })
+                                }).catch(err => {
+                                    toast.error("Error in image upload")
+                                })
                         }
                         if (cookie.load('email') !== this.state.email) {
                             cookie.remove("email", {
@@ -139,7 +139,7 @@ export class Profile extends Component {
                                 maxAge: 90000
                             })
                         }
-                        window.location.assign( "/profile" );
+                        window.location.assign("/profile");
                     }
 
                 }).catch(err => {
@@ -165,15 +165,15 @@ export class Profile extends Component {
                 language: response.data.language,
 
             })
-            if(response.data.image == null)
-            { 
+            if (response.data.image == null) {
                 this.setState({
-                    profileImagePath : BACKEND_URL + '/images/avatar.png'
-                })            }
-            else{
+                    profileImagePath: BACKEND_URL + '/images/avatar.png'
+                })
+            }
+            else {
                 this.setState({
-                profileImagePath : BACKEND_URL + '/images/profilepics/' + cookie.load('id') + '/' + response.data.image
-            })
+                    profileImagePath: BACKEND_URL + '/images/profilepics/' + cookie.load('id') + '/' + response.data.image
+                })
             }
         }
         catch (err) {
@@ -195,10 +195,32 @@ export class Profile extends Component {
             { value: 'CAD', label: 'CAD($)' }
         ]
         const timezone = [
-            { value: 'PST', label: 'Pacific Standard Time' },
-            { value: 'MST', label: 'Mountain Standard Time' },
-            { value: 'CST', label: 'Central Standard Time' },
-            { value: 'EST', label: 'Eastern Standard Time' },
+            { value: 'Pacific/Niue', label: '(GMT -11:00) Midway Island, Samoa' },
+            { value: 'Pacific/Rarotonga', label: '(GMT -10:00) Hawaii' },
+            { value: 'Asia/Pyongyang', label: '(GMT -9:00) Alaska' },
+            { value: 'America/Halifax', label: '(GMT -8:00) Pacific Time (US &amp; Canada)' },
+            { value: 'America/Halifax', label: '(GMT -7:00) Mountain Time (US &amp; Canada)' },
+            { value: 'America/Winnipeg', label: '(GMT -6:00) Central Time (US &amp; Canada), Mexico City' },
+            { value: 'America/Toronto', label: '(GMT -5:00) Eastern Time (US &amp; Canada), Bogota, Lima' },
+            { value: 'America/Dominica', label: '(GMT -4:00) Atlantic Time (Canada), Caracas, La Paz' },
+            { value: 'Chile/Continental', label: '(GMT -3:00) Brazil, Buenos Aires, Georgetown' },
+            { value: 'Atlantic/South_Georgia', label: '(GMT -2:00) Mid-Atlantic' },
+            { value: 'Africa/Banjul', label: '(GMT) Western Europe Time, London, Lisbon, Casablanca' },
+            { value: 'Europe/Gibraltar', label: '(GMT +1:00) Brussels, Copenhagen, Madrid, Paris' },
+            { value: 'Europe/Athens', label: '(GMT +2:00) Kaliningrad, South Africa' },
+            { value: 'America/New_York', label: '(GMT +3:00) Baghdad, Riyadh, Moscow, St. Petersburg' },
+            { value: 'Asia/Baku', label: '(GMT +4:00) Abu Dhabi, Muscat, Baku, Tbilisi' },
+            { value: 'Asia/Kabul', label: '(GMT +4:30) Kabul' },
+            { value: 'America/California', label: '(GMT +5:00) Ekaterinburg, Islamabad, Karachi, Tashkent' },
+            { value: 'America/New_York', label: '(GMT +5:30) Bombay, Calcutta, Madras, New Delhi' },
+            { value: 'America/Austin', label: '(GMT +5:45) Kathmandu, Pokhara' },
+            { value: 'Asia/Thimphu', label: '(GMT +6:00) Almaty, Dhaka, Colombo' },
+            { value: 'Asia/Dhaka', label: '(GMT +7:00) Bangkok, Hanoi, Jakarta' },
+            { value: 'Australia/West', label: '(GMT +8:00) Beijing, Perth, Singapore, Hong Kong' },
+            { value: 'Australia/North', label: '(GMT +9:30) Adelaide, Darwin' },
+            { value: 'Australia/Queensland', label: '(GMT +10:00) Eastern Australia, Guam, Vladivostok' },
+            { value: 'Australia/Canberra', label: '(GMT +11:00) Magadan, Solomon Islands, New Caledonia' },
+
         ]
         const language = [
             { value: 'English', label: 'English' },
@@ -226,7 +248,7 @@ export class Profile extends Component {
                         <div class="col-sm">
                             <div className="row"><h2 style={{ "marginLeft": '20px' }}>
                                 Your Account</h2></div>
-                            <img src={this.state.profileImagePath}  width="200" height="200" alt="" />
+                            <img src={this.state.profileImagePath} width="200" height="200" alt="" />
 
                             <div className="row"><p style={{ "margin-left": '20px' }}>Change your Avatar</p></div>
                             <div className="row">
@@ -252,7 +274,7 @@ export class Profile extends Component {
                                     <div className="col-3">
                                         <label>Your Email:</label>
                                         <input type="text" className="form-control" name="email"
-                                            placeholder={this.state.email } onChange={this.handleEmailChange} />
+                                            placeholder={this.state.email} onChange={this.handleEmailChange} />
                                         {emailError}
                                     </div>
                                     <div className="col-3" style={{ "marginTop": "30px" }}>

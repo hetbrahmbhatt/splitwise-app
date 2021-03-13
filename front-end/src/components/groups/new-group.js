@@ -2,9 +2,9 @@ import React, { Component } from 'react'
 import axios from 'axios';
 import cookie from "react-cookies";
 import BACKEND_URL from '../../config/config'
-import { ToastContainer, toast } from 'react-toastify';
 import AsyncSelect from 'react-select/async'
 import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from 'react-toastify';
 
 export class NewGroup extends Component {
     state = {

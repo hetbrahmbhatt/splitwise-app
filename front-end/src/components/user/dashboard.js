@@ -18,10 +18,10 @@ export class DashBoard extends Component {
             totalNegativeBalance: [],
             totalPositiveBalance: [],
             totalBalance: [],
-            totalOwingData : [],
-            totalOwingFlag : false,
-            totalGivingData : [],
-            totalGivingFlag : false
+            totalOwingData: [],
+            totalOwingFlag: false,
+            totalGivingData: [],
+            totalGivingFlag: false
         }
     }
     async componentDidMount() {
@@ -52,35 +52,40 @@ export class DashBoard extends Component {
         }
 
         const totalResponse = await axios.get(BACKEND_URL + "/expense/totalbalance/" + userID);
-        this.setState({
-            totalBalance: totalResponse.data
-        })
-        const totalOwingResponse = await axios.get(BACKEND_URL + "/expense/totalowing/" + userID);
-        console.log(totalOwingResponse.data)
-        if(totalOwingResponse.data == [])
-        {
+        if (totalResponse.data == []) {
             this.setState({
-                totalOwingFlag : true
+                totalBalance: "0.00 bucks"
             })
         }
-        else{
+        else {
             this.setState({
-                totalOwingData : totalOwingResponse.data,
-
+                totalBalance: totalResponse.data
+            })
+        }
+        const totalOwingResponse = await axios.get(BACKEND_URL + "/expense/totalowing/" + userID);
+        console.log(totalOwingResponse.data)
+        if (totalOwingResponse.data.length == 0) {
+            this.setState({
+                totalOwingFlag: true
+            })
+        }
+        else {
+            this.setState({
+                totalOwingData: totalOwingResponse.data,
+                totalOwingFlag: false
             })
         }
         const totalGivingResponse = await axios.get(BACKEND_URL + "/expense/totalgiving/" + userID);
         console.log(totalGivingResponse.data)
-        if(totalOwingResponse.data == [])
-        {
+        if (totalGivingResponse.data.length == 0) {
             this.setState({
-                totalGivingFlag : true
+                totalGivingFlag: true
             })
         }
-        else{
+        else {
             this.setState({
-                totalGivingData : totalGivingResponse.data,
-                totalGivingFlag : false
+                totalGivingData: totalGivingResponse.data,
+                totalGivingFlag: false
 
             })
         }
@@ -89,7 +94,7 @@ export class DashBoard extends Component {
     render() {
         let totalOwe = null;
         let totalGiving = null;
-
+        console.log(this.state)
         if (this.state.totalOwingFlag) {
             totalOwe = (
                 <div style={{ margin: "130px" }}>
@@ -160,10 +165,10 @@ export class DashBoard extends Component {
                     <div className="col-1">
                     </div>
                 </div>
-                <div className="row" style={{marginTop:"20px"}}>
+                <div className="row" style={{ marginTop: "20px" }}>
                     <div className="col-1">
                     </div>
-                    <div className="col-5" style={{borderRight :"2px solid lightgrey"}}>
+                    <div className="col-5" style={{ borderRight: "2px solid lightgrey" }}>
                         <div style={{ marginLeft: "250px" }}>
                             YOU OWE
                         </div>
@@ -177,7 +182,7 @@ export class DashBoard extends Component {
                 <div className="row">
                     <div className="col-1">
                     </div>
-                    <div className="col-5" style={{borderRight :"2px solid lightgrey"}}>
+                    <div className="col-5" style={{ borderRight: "2px solid lightgrey" }}>
                         <div style={{ padding: "0px" }}>
                             {totalOwe}
                         </div>
@@ -185,7 +190,7 @@ export class DashBoard extends Component {
                     <div className="col-5">
                         {totalGiving}
                         <div style={{ marginLeft: "150px" }}>
-                    </div>
+                        </div>
                     </div>
                 </div>
 

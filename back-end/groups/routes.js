@@ -76,14 +76,15 @@ router.post('/recentactivitybygroups/', (req, res) => {
     var orderBy = req.body.orderBy;
     var sql = null;
     if (groupID == null)
-        sql = `SELECT mu.name as username,me.amount,me.createdat,me.ref_paidby,me.currency,mg.name,mg.groupid,mg.count,me.description,mg.image FROM splitwise.master_expense as me inner join users as mu on mu.userid = me.ref_paidby inner join master_group as mg on me.ref_groupid = mg.groupid where ref_groupid IN (select m.ref_groupid from members as m  inner join master_group as me on m.ref_groupid = me.groupid where status=2 and m.ref_userid = ${userID} ) order by createdat ${orderBy};`;
+        sql = `SELECT mu.name as username,me.amount,me.createdat,me.ref_paidby,u2.name as settlename,me.currency,mg.name,mg.groupid,mg.count,me.description,mg.image,me.settleFlag FROM splitwise.master_expense as me inner join users as mu on mu.userid = me.ref_paidby inner join master_group as mg on me.ref_groupid = mg.groupid left join users as u2 on u2.userid = me.settleFlag where ref_groupid IN (select m.ref_groupid from members as m  inner join master_group as me on m.ref_groupid = me.groupid where status=2 and m.ref_userid = ${userID} ) order by createdat ${orderBy}`;
     else
-        sql = `SELECT mu.name as username,me.amount,me.createdat,me.ref_paidby,me.currency,mg.name,mg.groupid,mg.count,me.description,mg.image FROM splitwise.master_expense as me inner join users as mu on mu.userid = me.ref_paidby inner join master_group as mg on me.ref_groupid = mg.groupid where ref_groupid IN (select m.ref_groupid from members as m  inner join master_group as me on m.ref_groupid = me.groupid where status=2 and m.ref_userid = ${userID} and groupid = ${groupID} ) order by createdat ${orderBy};`;
+        sql = `SELECT mu.name as username,me.amount,me.createdat,me.ref_paidby,u2.name as settlename,me.currency,mg.name,mg.groupid,mg.count,me.description,mg.image,me.settleFlag FROM splitwise.master_expense as me inner join users as mu on mu.userid = me.ref_paidby inner join master_group as mg on me.ref_groupid = mg.groupid left join users as u2 on u2.userid = me.settleFlag where ref_groupid IN (select m.ref_groupid from members as m  inner join master_group as me on m.ref_groupid = me.groupid where status=2 and m.ref_userid = ${userID} and groupid = ${groupID} ) order by createdat ${orderBy}`;
     connection.query(sql, (err, results) => {
         if (err) {
 
         }
         else {
+            console.log(results);
             res.status(200).send(JSON.stringify(results));
 
         }
@@ -92,9 +93,7 @@ router.post('/recentactivitybygroups/', (req, res) => {
 });
 router.get('/description/:id', (req, res) => {
     var groupID = req.params.id;
-
     var sql = `select me.description,u.name,me.amount,me.createdat,me.currency,me.settleFlag,u2.name as settlename from master_expense me inner join users  u on u.userid = me.ref_paidby left join users u2 on u2.userid = me.settleFlag where ref_groupid = ${groupID} order by createdat desc`;
- 
     connection.query(sql, (err, results) => {
         if (err) {
             console.log(err);
@@ -311,10 +310,10 @@ router.post('/totalbalance/:id', async (req, res) => {
     userID = req.params.id;
     var sql = `select CONCAT(currency, sum(groupbalance)) as groupBalance from recent_activity where ref_userid = ${userID} group by currency;`;
     await connection.query(sql, (err, sqlresults) => {
-        if(sql){
+        if (sql) {
 
         }
-        else{
+        else {
 
         }
     });
@@ -322,57 +321,98 @@ router.post('/totalbalance/:id', async (req, res) => {
 
 });
 router.post('/individualexpense/:id', async (req, res) => {
-    console.log(req.body);
-    console.log(req.params.id);
     groupID = req.params.id;
-    var result = [];
-    const results = req.body;
-    for (let i = 0; i < results.length; i++) {
-        var sql = `select sum(groupbalance),currency,ref_groupid,ref_userid,u.name from recent_activity as ra inner join users as u  on ra.ref_userid = u.userid   where ref_userid = ${results[i].ref_userid}  and ref_groupid = ${groupID} group by ref_groupid,currency ;`;
-        await connection.query(sql, (err, sqlresults) => {
-            if (err) {
-                console.log(err);
-                res.sendStatus(500);
-                return;
-            }
-            else {
-                for (let j = 0; j < sqlresults.length; j++) {
-                    if (sqlresults[j]['sum(groupbalance)'] < 0) {
-                        result.push(results[i].name + " owes " + sqlresults[j]['currency'] + ((-1) * sqlresults[j]['sum(groupbalance)']));
-                        // x.set(results[i].ref_userid,x.get(results[i].ref_userid) + "/" + results[i].name + " owes " + sqlresults[j]['currency'] + ((-1) * sqlresults[j]['sum(groupbalance)']) );
+    console.log(groupID);
+    console.log(req.body);
+    var sql = `select sum(groupbalance) as balance,currency,ref_groupid,ref_userid,u.name,u.image from recent_activity as ra inner join users as u  on ra.ref_userid = u.userid   where ref_userid = ${req.body.ref_userid}  and ref_groupid = ${groupID} group by ref_groupid,currency ;`;
+    await connection.query(sql, (err, sqlresults) => {
+        if (err) {
 
-                    }
-                    else {
-                        result.push(results[i].name + " gets back " + sqlresults[j]['currency'] + ((1) * sqlresults[j]['sum(groupbalance)']));
+        }
+        else {
+            res.send(JSON.stringify(sqlresults));
+            // console.log(JSON.stringify(sqlresults));
+            // for (let j = 0; j < sqlresults.length; j++) {
+            //     if (sqlresults[j]['sum(groupbalance)'] < 0) {
+            //         result.push(  " owes " + sqlresults[j]['currency'] + ((-1) * sqlresults[j]['sum(groupbalance)']));
+            //         // x.set(results[i].ref_userid,x.get(results[i].ref_userid) + "/" + results[i].name + " owes " + sqlresults[j]['currency'] + ((-1) * sqlresults[j]['sum(groupbalance)']) );
 
-                        // x.set(results[i].ref_userid,x.get(results[i].ref_userid) + "/" + results[i].name + " gets back " + sqlresults[j]['currency'] + sqlresults[j]['sum(groupbalance)'] );
-                    }
-                    // if(x.has(results[i].ref_userid)){
-                    //     if(sqlresults[j]['sum(groupbalance)'] < 0){
-                    //         x.set(results[i].ref_userid,x.get(results[i].ref_userid) + "/" + results[i].name + " owes " + sqlresults[j]['currency'] + ((-1) * sqlresults[j]['sum(groupbalance)']) );
+            //     }
+            //     else {
+            //         result.push(  " gets back " + sqlresults[j]['currency'] + ((1) * sqlresults[j]['sum(groupbalance)']));
 
-                    //     }
-                    //     else{
-                    //         x.set(results[i].ref_userid,x.get(results[i].ref_userid) + "/" + results[i].name + " gets back " + sqlresults[j]['currency'] + sqlresults[j]['sum(groupbalance)'] );
-                    //     }
-                    // }
-                    // else{
-                    //     if(sqlresults[j]['sum(groupbalance)'] < 0){
-                    //         x.set(results[i].ref_userid,results[i].name + " owes " + sqlresults[j]['currency'] + ((-1) * sqlresults[j]['sum(groupbalance)']) );
-                    //     }
-                    //     else
-                    //     {
-                    //         x.set(results[i].ref_userid, results[i].name + " gets back " + sqlresults[j]['currency'] + sqlresults[j]['sum(groupbalance)'] );
-                    //     }
-                    // }
-                    
-                }
-            }
-        });
-    }
-    console.log(result);
+            // x.set(results[i].ref_userid,x.get(results[i].ref_userid) + "/" + results[i].name + " gets back " + sqlresults[j]['currency'] + sqlresults[j]['sum(groupbalance)'] );
+        }
+        // if(x.has(results[i].ref_userid)){
+        //     if(sqlresults[j]['sum(groupbalance)'] < 0){
+        //         x.set(results[i].ref_userid,x.get(results[i].ref_userid) + "/" + results[i].name + " owes " + sqlresults[j]['currency'] + ((-1) * sqlresults[j]['sum(groupbalance)']) );
+
+        //     }
+        //     else{
+        //         x.set(results[i].ref_userid,x.get(results[i].ref_userid) + "/" + results[i].name + " gets back " + sqlresults[j]['currency'] + sqlresults[j]['sum(groupbalance)'] );
+        //     }
+        // }
+        // else{
+        //     if(sqlresults[j]['sum(groupbalance)'] < 0){
+        //         x.set(results[i].ref_userid,results[i].name + " owes " + sqlresults[j]['currency'] + ((-1) * sqlresults[j]['sum(groupbalance)']) );
+        //     }
+        //     else
+        //     {
+        //         x.set(results[i].ref_userid, results[i].name + " gets back " + sqlresults[j]['currency'] + sqlresults[j]['sum(groupbalance)'] );
+        //     }
+        // }
+        // res.write(result);
+        //         }
+        //     }
+        // });
+        // console.log("object")
+        // console.log(result);
+        // for (let i = 0; i < results.length; i++) {
+        //     var sql = `select sum(groupbalance),currency,ref_groupid,ref_userid,u.name from recent_activity as ra inner join users as u  on ra.ref_userid = u.userid   where ref_userid = ${results[i].ref_userid}  and ref_groupid = ${groupID} group by ref_groupid,currency ;`;
+        //     await connection.query(sql, (err, sqlresults) => {
+        //         if (err) {
+        //             console.log(err);
+        //             res.sendStatus(500);
+        //             return;
+        //         }
+        //         else {
+        //             for (let j = 0; j < sqlresults.length; j++) {
+        //                 if (sqlresults[j]['sum(groupbalance)'] < 0) {
+        //                     result.push(results[i].name + " owes " + sqlresults[j]['currency'] + ((-1) * sqlresults[j]['sum(groupbalance)']));
+        //                     // x.set(results[i].ref_userid,x.get(results[i].ref_userid) + "/" + results[i].name + " owes " + sqlresults[j]['currency'] + ((-1) * sqlresults[j]['sum(groupbalance)']) );
+
+        //                 }
+        //                 else {
+        //                     result.push(results[i].name + " gets back " + sqlresults[j]['currency'] + ((1) * sqlresults[j]['sum(groupbalance)']));
+
+        //                     // x.set(results[i].ref_userid,x.get(results[i].ref_userid) + "/" + results[i].name + " gets back " + sqlresults[j]['currency'] + sqlresults[j]['sum(groupbalance)'] );
+        //                 }
+        //                 // if(x.has(results[i].ref_userid)){
+        //                 //     if(sqlresults[j]['sum(groupbalance)'] < 0){
+        //                 //         x.set(results[i].ref_userid,x.get(results[i].ref_userid) + "/" + results[i].name + " owes " + sqlresults[j]['currency'] + ((-1) * sqlresults[j]['sum(groupbalance)']) );
+
+        //                 //     }
+        //                 //     else{
+        //                 //         x.set(results[i].ref_userid,x.get(results[i].ref_userid) + "/" + results[i].name + " gets back " + sqlresults[j]['currency'] + sqlresults[j]['sum(groupbalance)'] );
+        //                 //     }
+        //                 // }
+        //                 // else{
+        //                 //     if(sqlresults[j]['sum(groupbalance)'] < 0){
+        //                 //         x.set(results[i].ref_userid,results[i].name + " owes " + sqlresults[j]['currency'] + ((-1) * sqlresults[j]['sum(groupbalance)']) );
+        //                 //     }
+        //                 //     else
+        //                 //     {
+        //                 //         x.set(results[i].ref_userid, results[i].name + " gets back " + sqlresults[j]['currency'] + sqlresults[j]['sum(groupbalance)'] );
+        //                 //     }
+        //                 // }
+        //                 res.write(result);
+        //             }
+        //         }
+        //     });
+        // }
+        res.end();
+    });
 });
-
 router.get('/individualdata/:id', async (req, res) => {
     var result = []
     var resultsx = null;

@@ -51,10 +51,14 @@ export class Navbar extends Component {
                         <div class="collapse navbar-collapse" id="navbarNav">
                             <ul class="navbar-nav ml-auto" >
                                 <li class="nav-item" >
-                                    <Link class="nav-link" to="/login" style={{ color: '#20BF9F', "margin-right": "0px" }}>Login</Link>
+                                    <Link to="/login">
+                                    <button type="button" class="btn btn-outline-success" style={{marginRight : "50px"}}>Login</button>
+                                    </Link>
                                 </li>
                                 <li class="nav-item">
-                                    <Link class="nav-link" to="/signup" style={{ color: "white", "margin-right": "100px", backgroundColor: "#20BF9F" }}>Sign-up</Link>
+                                    <Link to="/signup">
+                                    <button type="button" class="btn btn-outline-success" style={{backgroundColor : "#20BF9F",color : "white",marginRight : "20px"}}>Sign-up</button>
+                                    </Link>
                                 </li>
                             </ul>
                         </div>

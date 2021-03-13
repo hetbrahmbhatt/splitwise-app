@@ -5,6 +5,7 @@ import cookie from "react-cookies";
 import axios from 'axios';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 export class AddExpense extends Component {
@@ -31,16 +32,17 @@ export class AddExpense extends Component {
                 userID: cookie.load('id'),
                 description: "",
                 amount: "",
-                amountFlag: false
+                amountFlag: false,
             }
         }
     }
     handleInputChange = inp => {
-        if (inp.target.value < 0) {
+        if (inp.target.value <= 0) {
             this.setState({
                 amountFlag: true
             })
         }
+        else
         {
             this.setState({
                 amountFlag : false,
@@ -50,18 +52,11 @@ export class AddExpense extends Component {
     }
     handleSubmit = e => {
         e.preventDefault();
-        if (this.state.groupName == "") {
-            toast.error("Please enter group name");
-            return;
-        }
-        var currency = {
-            currency: cookie.load("defaultcurrency")
-        };
         if (!this.state.amountFlag) {
             axios
                 .post(BACKEND_URL + "/groups/expenses", this.state).then(response => {
-                    if (response.status === 200) {
-                        window.location.reload();
+                    console.log(response);
+                    if (response.status == 200) {
                         toast.success("Group Updated Successfully");
                     }
                 }).catch(err => {
@@ -73,6 +68,10 @@ export class AddExpense extends Component {
                     }
                     // toast.error(err.response.data);
                 })
+        }
+        else{
+            toast.error("Please enter an amount greater than 0");
+
         }
     }
     render() {
@@ -121,7 +120,7 @@ export class AddExpense extends Component {
                         </div>
                     </div>
                     {renderError}
-
+                    <ToastContainer />
                 </div>
 
             </div>
