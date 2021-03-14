@@ -158,8 +158,10 @@ router.put('/editprofile', (req, res) => {
     var values = [name, email, phoneno, timezone, language, defaultcurrency]
     connection.query(sql, values, (err, results) => {
         if (err) {
-            console.log(err);
-            res.status(400).end("Error:", err);
+            if (err.sqlMessage.includes("Duplicate entry")) {
+                res.status(400).send('Email already exists');
+            }
+            res.status(400).end("Error:", err).sqlMessage;
         } else {
             res.status(200).send(JSON.stringify(results));
         }

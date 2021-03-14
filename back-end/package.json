@@ -5,13 +5,15 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
+    "chai": "^4.3.4",
+    "chai-http": "^4.3.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "eslint-config-node": "^4.1.0",
@@ -23,6 +25,7 @@
     "gson": "^0.1.5",
     "hashmap": "^2.4.0",
     "joi": "^17.4.0",
+    "mocha": "^8.3.2",
     "mysql": "^2.18.1",
     "nodemon": "^2.0.7",
     "path": "^0.12.7"

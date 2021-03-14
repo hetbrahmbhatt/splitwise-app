@@ -4,7 +4,6 @@ var connection = require('../config/db-config').connection;
 
 router.get('/negtotalbalance/:id', (req, res) => {
     var userID = req.params.id;
-    console.log(userID);
     var result = []
     var sql = `select CONCAT(currency, -1*sum(groupbalance)) as groupBalance from recent_activity where ref_userid = ${userID} and groupbalance < 0 group by currency;`;
     connection.query(sql, (err, results) => {
@@ -107,7 +106,6 @@ router.post('/owingsettleup', (req, res) => {
     timestamp = year + "-" + month + "-" + date + "-" + time;
     var userid1 = null;
     var userid2 = null;
-    var groupID = null;
     var amountToUpdate = 0;
     if (Number(req.body.amount) > 0) {
         amountToUpdate = req.body.amount;
@@ -117,8 +115,7 @@ router.post('/owingsettleup', (req, res) => {
 
     }
     var sessionID = Number(req.body.sessionID);
-    console.log(Number(sessionID));
-    console.log(req.body);
+
     if (Number(req.body.userid1) < req.body.userid2) {
         userid1 = req.body.userid1;
         userid2 = req.body.userid2
@@ -126,8 +123,6 @@ router.post('/owingsettleup', (req, res) => {
         userid1 = req.body.userid2;
         userid2 = req.body.userid1;
     }
-    console.log(userid1);
-    console.log(userid2);
     var anotherid = null;
     if (sessionID == userid1) {
         anotherid = userid2
@@ -135,9 +130,6 @@ router.post('/owingsettleup', (req, res) => {
     else {
         anotherid = userid1;
     }
-    console.log(req.body.ref_groupid);
-    console.log(amountToUpdate);
-
     var sql = `update debt set amount=0,currency=null where userid1 = ${userid1} and userid2 = ${userid2} and ref_groupid = ${req.body.ref_groupid} and currency ='${req.body.currency}';`;
     connection.query(sql, (err, results) => {
         if (err) {
@@ -158,7 +150,6 @@ router.post('/owingsettleup', (req, res) => {
                             console.log(err);
                         }
                         else {
-                            console.log("Over here");
                             var sql = ` update recent_activity set groupbalance = groupbalance - ${amountToUpdate} where ref_userid = ${sessionID} and currency = '${req.body.currency}' and ref_groupid=${req.body.ref_groupid};update recent_activity set groupbalance = groupbalance + ${amountToUpdate} where ref_userid = ${anotherid} and currency = '${req.body.currency}' and ref_groupid=${req.body.ref_groupid}`;
                             connection.query(sql, (err, results) => {
                                 if (err) {

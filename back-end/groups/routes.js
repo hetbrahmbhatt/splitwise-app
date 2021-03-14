@@ -21,7 +21,7 @@ router.get('/invitedgroups/:id', (req, res) => {
 });
 router.get('/groupbyid/:id', (req, res) => {
     var id = req.params.id;
-
+    console.log(id);
     var sql = `select * from master_group where groupID="${id}"`;
     connection.query(sql, (err, results) => {
         if (err) {
@@ -429,7 +429,6 @@ router.get('/individualdata/:id', async (req, res) => {
     });
 });
 router.post('/expenses', (req, res) => {
-    console.log(req);
     let timestamp = null;
     var totalbalance = null;
     var oldtBalance = 0;
@@ -493,17 +492,23 @@ router.post('/expenses', (req, res) => {
                                 if (results.length > 0) {
                                     if (group_members2[i] == req.body.userID) {
                                         groupBalance = dividedAmount * (total_Members - 1);
+                                        groupBalance = groupBalance.toString();
+                                        groupBalance = groupBalance.slice(0,(groupBalance.indexOf("."))+3);
+                                        console.log("---------Hereee------")
+
+                                        console.log(groupBalance);
+                                        console.log("---------Hereee------")
+
                                     }
                                     else {
                                         groupBalance = -(dividedAmount);
                                     }
-                                    console.log("--------------.")
-                                    console.log(results[0]);
                                     var oldgBalance = results[0].groupbalance;
                                     var newgBalance = parseFloat(Number(oldgBalance) + Number(groupBalance));
                                     console.log(newgBalance);
+                                    console.log("---------Hereee------")
+
                                     var newtotalbalance = parseFloat(Number(oldtBalance) + Number(groupBalance));
-                                    console.log(newtotalbalance);
                                     var recentactivityid = results[0].recentactivityid;
                                     var sql = `update recent_activity set groupbalance=${newgBalance},totalbalance=${newtotalbalance} where recentactivityid=${recentactivityid}`;
                                     connection.query(sql, (err, results) => {
@@ -512,13 +517,14 @@ router.post('/expenses', (req, res) => {
                                             //res.status(400).end("Error:", err);
                                         }
                                         else {
-                                            console.log(results);
                                         }
                                     });
                                 }
                                 else {
                                     if (group_members2[i] == req.body.userID) {
                                         groupBalance = dividedAmount * (total_Members - 1);
+                                        groupBalance = groupBalance.toString();
+                                        groupBalance = groupBalance.slice(0,(groupBalance.indexOf("."))+3);
                                     }
                                     else {
                                         groupBalance = -(dividedAmount);
