@@ -11,14 +11,7 @@ var mysql = require( 'mysql');
 var cookieParser = require( "cookie-parser" );
 const fileUpload = require('express-fileupload');
 const app = express();
-//Session management
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password:'masterpassword',
-    database : 'test',
-    port : 3306
-});
+//Session manageme
 app.use(fileUpload());
 app.use( bodyParser.json() );
 app.use( bodyParser.urlencoded( { extended: false } ) );
@@ -36,13 +29,6 @@ app.use(
         }
     } )
 );
-db.connect((error) =>{
-    if(error)
-    {
-        throw error;
-    }
-    console.log("Mysql connected");
-})
 app.get('/createdb',(req,res) => {
     let mysql = 'CREATE DATABASE MYSQL';
     db.query(mysql ,(err,result)=>{
