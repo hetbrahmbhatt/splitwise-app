@@ -5,6 +5,7 @@ import BACKEND_URL from '../../config/config'
 import AsyncSelect from 'react-select/async'
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
+import { Redirect } from 'react-router'
 
 export class NewGroup extends Component {
     state = {
@@ -88,7 +89,7 @@ export class NewGroup extends Component {
                 .post(BACKEND_URL + "/groups/new", this.state).then(response => {
                     if (response.status === 200) {
                         toast.success("Group Created Successfully");
-                        window.location.assign("/dashboard");
+                        window.location.assign("/all-group");
                         const formData = new FormData();
                         formData.append('profileImage', this.state.updatedProfileImage, this.state.updatedProfileImage.name + "," + response.data.groupID)
                         const config = {
@@ -119,6 +120,10 @@ export class NewGroup extends Component {
     }
 
     render() {
+        let redirectTo = null;
+        if (!(cookie.load("auth"))) {
+            redirectTo = <Redirect to="/" />
+        }
         let gError = null
         let emailDivision = null
         let nameDivision = null
@@ -148,6 +153,7 @@ export class NewGroup extends Component {
         }
         return (
             <div>
+                { redirectTo}
                 <div className="row" style={{ "height": "10vh" }}>
                 </div>
                 <div className="row" style={{ "height": "100vh" }}>

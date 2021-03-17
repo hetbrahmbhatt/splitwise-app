@@ -57,6 +57,7 @@ export class AddExpense extends Component {
                 .post(BACKEND_URL + "/groups/expenses", this.state).then(response => {
                     console.log(response);
                     if (response.status == 200) {
+                        console.log(response);
                         toast.success("Group Updated Successfully");
                     }
                 }).catch(err => {

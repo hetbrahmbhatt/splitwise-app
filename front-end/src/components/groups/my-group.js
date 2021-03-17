@@ -116,7 +116,7 @@ export class MyGroup extends Component {
 
                 <div className="row">
                     <div className="col-6">
-                        <h1 style={{ marginLeft: "50px", "marginBottom": "40px", "marginLeft": "150px" }}>Group Invitations</h1>
+                        <h1 style={{ marginLeft: "50px", "marginBottom": "40px","marginLeft": "150px" }}>Group Invitations</h1>
                         {groupInvitationDetails}
 
                         <div style={{ "borderLeft": "6px solid black", "height": "100%", "position": "absolute", "left": "100%", "marginLeft": "-3px", "top": "0px" }}></div>

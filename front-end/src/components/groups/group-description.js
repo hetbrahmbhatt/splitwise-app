@@ -24,7 +24,6 @@ const customStyles = {
         transform: 'translate(-50%, -50%)'
     }
 };
-// TODO: Placeholder in expenses
 export class GroupDescription extends Component {
 
     constructor(props) {
@@ -235,7 +234,7 @@ export class GroupDescription extends Component {
         }
         else {
             groupDescriptionDetails = this.state.groupDescription.map((group, index) => {
-                if (group.settleFlag == 0) {
+                if (group.settleFlag == null) {
                     return (
                         <div className="row" style={{ height: "100px", borderBottom: "0.01px solid lightgrey", borderLeft: "0.01px solid lightgrey", borderRight: "0.01px solid lightgrey", borderWidth: "thin", marginBottom: "1px" }}>
                             <div className="col-1" style={{ margin: "20px", color: "grey" }}>

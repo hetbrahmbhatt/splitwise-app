@@ -9,7 +9,6 @@ import _ from 'lodash';
 import EditGroup from './edit-group';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// TODO: Leave Button Request in the backend needs to be updated 
 export class AcceptedGroup extends Component {
     constructor(props) {
         super(props);
@@ -100,7 +99,6 @@ export class AcceptedGroup extends Component {
                 <div className="edit-option" >
                     <button className="btn btn-warning" onClick={this.toggleGroupPopUp}>Edit Group</button>
                 </div>
-                {/* TODO: Close button in react modal */}
                 <Modal isOpen={this.state.groupPopUp} >
                     <EditGroup groupData={this.state} ariaHideApp={false}
                         closePopUp={this.toggleGroupPopUp}/>

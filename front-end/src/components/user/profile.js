@@ -5,7 +5,6 @@ import cookie from 'react-cookies';
 import axios from 'axios';
 import BACKEND_URL from '../../config/config'
 import Select from 'react-select'
-//TODO: Change the keys for dropdown
 export class Profile extends Component {
     state = {
         userID: cookie.load('id'),
@@ -39,6 +38,13 @@ export class Profile extends Component {
     }
     //handle input change
     handleInputChange = inp => {
+        if (inp.target.value == "") {
+            this.setState({
+                error: true,
+                errorMessage: "Please enter a username",
+                [inp.target.name]: ""
+            })
+        }
         // console.log( inp.target.name, inp.target.value );
         if (/[~`!#$@%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/g.test(inp.target.value)) {
             this.setState({
@@ -52,6 +58,7 @@ export class Profile extends Component {
                 [inp.target.name]: inp.target.value
             })
         }
+
     }
     handleCurrencyChange = e => {
         this.setState({
@@ -74,9 +81,38 @@ export class Profile extends Component {
             profileImageUpdate: true
         })
     }
+
+    handleNumberChange = inp => {
+        if (/^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g.test(inp.target.value)) {
+            this.setState({
+                error: false,
+                [inp.target.name]: inp.target.value,
+                errorMessage: " "
+            })
+        } else {
+            this.setState({
+                error: true,
+                errorMessage: "Please write in standard format",
+                [inp.target.name]: ""
+            })
+        }
+    }
     handleOnSubmit = e => {
         e.preventDefault();
-        if (!this.state.error) {
+        console.log(this.state);
+        if (this.state.name == "") {
+            this.setState({
+                error: true,
+                errorMessage: "Please enter a username",
+            })
+        }
+        else if(this.state.email == ""){
+            this.setState({
+                error: true,
+                errorMessage: "Please enter email",
+            }) 
+        }
+        else if(!this.state.error){
             axios
                 .put(BACKEND_URL + "/users/editprofile", this.state).then(response => {
                     if (response.status === 200) {
@@ -143,6 +179,7 @@ export class Profile extends Component {
                     }
 
                 }).catch(err => {
+                    console.log(err.response);
                     this.setState({
                         errorMessage: err.response.data,
                         emailError: true
@@ -287,9 +324,10 @@ export class Profile extends Component {
                                 <div className="row" style={{ "marginLeft": '-300px', "marginTop": '30px' }}>
                                     <div className="col-3">
                                         <label>Your Phone No:</label>
-                                        <input type="number" className="form-control" name="phoneno"
-                                            placeholder={this.state.phoneno} onChange={this.handleInputChange} />
+                                        <input type="text" className="form-control" name="phoneno"
+                                            placeholder={this.state.phoneno} onChange={this.handleNumberChange} />
                                     </div>
+                                    
                                     <div className="col-3" style={{ "marginTop": "30px" }}>
                                         <Select
                                             options={language}

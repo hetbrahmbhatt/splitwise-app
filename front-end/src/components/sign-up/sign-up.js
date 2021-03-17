@@ -28,6 +28,21 @@ export class signup extends Component {
 
     }
 
+    handleNumberChange = inp => {
+        if (/^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g.test(inp.target.value)) {
+            this.setState({
+                error: false,
+                [inp.target.name]: inp.target.value,
+                errorMessage: " "
+            })
+        } else {
+            this.setState({
+                error: true,
+                errorMessage: "Please write in standard format",
+                [inp.target.name]: ""
+            })
+        }
+    }
     handleEmailChange = inp => {
         console.log(inp.target.name, inp.target.value);
         if (/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(inp.target.value)) {
@@ -121,12 +136,11 @@ export class signup extends Component {
         let renderError = null
         let emailError = null;
         let redirectVar = null
-
         if (this.props.auth) {
             redirectVar = <Redirect to="/dashboard" />
         }
-        if (this.state.emailError) {
-            emailError = <div style={{ 'color': 'red' }}>{this.state.errorMessage}</div>
+        if (this.props.error) {
+            emailError = <div style={{ 'color': 'red' }}>User already exists</div>
         }
         if (this.state.error) {
             renderError = <div style={{ 'color': 'red' }}>{this.state.errorMessage}</div>
@@ -160,7 +174,7 @@ export class signup extends Component {
                                         {this.state.type === 'restaurants' ? <input type="text" className="form-control" name="address" required
                                             placeholder="Enter location" onChange={this.handleInputChange} /> : undefined}
                                     </div>
-                                    <button type="submit" className="btn btn-success" onSubmit={this.handleSubmit}>Sign Up</button>
+                                    <button type="submit" style={{ "marginLeft":"80px","backgroundColor": "#FF8C00"}}className="btn btn-success" onSubmit={this.handleSubmit}>Sign Up</button>
                                 </form>
                                 {renderError}
                             </div>

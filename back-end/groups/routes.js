@@ -69,8 +69,6 @@ router.get('/totalgroups/:id', (req, res) => {
 
 });
 router.post('/recentactivitybygroups/', (req, res) => {
-    console.log("--------------")
-    console.log(req.body);
     var userID = req.body.userID;
     var groupID = req.body.groupID;
     var orderBy = req.body.orderBy;
@@ -145,7 +143,7 @@ router.put('/updategroup/', (req, res) => {
     connection.query(sql, values, (err, results) => {
         if (err) {
             if (err.sqlMessage.includes("Duplicate entry")) {
-                res.status(400).send(' Duplicate Group Name')
+                res.status(400).send(' Group  Already Exists')
             }
             res.status(400).end("Error in updating, Please contact database administrator.");
         }
@@ -255,7 +253,6 @@ router.post('/new', (req, res) => {
             }
             var sql = `insert into members(ref_userID,ref_groupID,status,invitedBy) values(?,?,?,?);`
             var values = [req.body.userID, results.insertId, 2, req.body.userID];
-            //TODO: The id of the person appears twice, change that 
             connection.query(sql, values, (err, results, fields) => {
                 if (err) {
                     console.log(err);
@@ -298,6 +295,7 @@ router.get('/recentactivity/:id', (req, res) => {
     var sql = `SELECT mu.name as username,mu2.name as settlename,me.amount,me.createdat,me.settleFlag,me.ref_paidby,me.currency,mg.name,mg.groupid,mg.count,me.description,mg.image FROM splitwise.master_expense as me inner join users as mu on mu.userid = me.ref_paidby inner join master_group as mg on me.ref_groupid = mg.groupid left join users as mu2 on mu2.userid = me.settleFlag where ref_groupid IN (select m.ref_groupid from members as m  inner join master_group as me on m.ref_groupid = me.groupid  where status=2 and m.ref_userid = ${userID} ) order by createdat desc;`;
     connection.query(sql, (err, results) => {
         if (err) {
+            console.log(err);
             res.send(400).end("Sorry! Nothing to display");
         }
         else {
@@ -529,15 +527,14 @@ router.post('/expenses', (req, res) => {
                                     else {
                                         groupBalance = -(dividedAmount);
                                     }
-                                    var values = [ref_expenseid, group_members2[i], amount, groupID, req.body.currency, groupBalance, groupBalance, timestamp, null];
-                                    var sql = `insert into recent_activity(ref_expenseid,ref_userid,amount,ref_groupid,currency,groupbalance,totalbalance,createdat,updatedat) values(?,?,?,?,?,?,?,?,?);`
+                                    var values = [ref_expenseid, group_members2[i], amount, groupID, req.body.currency, groupBalance, groupBalance, timestamp];
+                                    var sql = `insert into recent_activity(ref_expenseid,ref_userid,amount,ref_groupid,currency,groupbalance,totalbalance,createdat) values(?,?,?,?,?,?,?,?);`
                                     connection.query(sql, values, (err, results, fields) => {
                                         if (err) {
                                             console.log(err);
                                             // res.status(400).send("Error");
                                         }
                                         else {
-
                                         }
                                     });
                                 }
@@ -637,6 +634,7 @@ router.post('/expenses', (req, res) => {
 
         }
     });
+    res
 });
 
 module.exports = router;

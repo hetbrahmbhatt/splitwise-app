@@ -31,12 +31,14 @@ router.post('/signup', (req, res) => {
                         console.log(err);
                     }
                     else if (results.length > 0) {
+                        var userdata = null;
                         userdata = {
                             id: results[0].userID,
                             name: results[0].name,
                             email: results[0].email,
                             currency: results[0].defaultcurrency
                         }
+                        console.log(userdata);
                         req.session.user = email;
 
                     }
@@ -51,19 +53,17 @@ router.post('/signup', (req, res) => {
 
 //login
 router.post('/login', (req, res) => {
-    console.log("cswefcfccepdpepeppeppepeep")
-    console.log(req.body);
     var email = req.body.email
     var password = req.body.password
     var sql = `select userID,name,email,password,defaultcurrency from users where email="${email}"`;
 
     connection.query(sql, (err, results) => {
         if (err) {
-            console.log(err);
+            res.status(400).end("Invalid Credentials");
         } else {
             if (results.length > 0) {
                 if (bcrypt.compareSync(password, results[0].password)) {
-                    console.log(results[0])
+                    var userdata = null;
                     userdata = {
                         id: results[0].userID,
                         name: results[0].name,
@@ -75,7 +75,6 @@ router.post('/login', (req, res) => {
                 } else {
                     res.status(400).end("Invalid Credentials");
                 }
-
             } else {
                 res.status(400).end("User Not found");
             }

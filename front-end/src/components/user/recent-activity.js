@@ -1,4 +1,4 @@
-import React, { Component, useRef } from 'react';
+import React, { Component } from 'react';
 import cookie from "react-cookies";
 import BACKEND_URL from '../../config/config';
 import axios from 'axios';
@@ -6,6 +6,7 @@ import grocerylogo from '../../images/grocery.png'
 import emptyplaceholder from '../../images/empty-placeholder.png'
 import moment from 'moment-timezone';
 import Select from 'react-select';
+import { Redirect } from 'react-router'
 
 export class RecentActivity extends Component {
     constructor(props) {
@@ -144,10 +145,14 @@ export class RecentActivity extends Component {
         window.location.reload();
     };
     render() {
+        let redirectTo = null;
+        if (!(cookie.load("auth"))) {
+            redirectTo = <Redirect to="/" />
+        }
         console.log(this.state);
         let orderByOptions = [
-            { value: 'DESC', label: 'Descending' },
-            { value: 'ASC', label: 'Ascending' },
+            { value: 'DESC', label: 'Most Recent First' },
+            { value: 'ASC', label: 'Most Recent Last' },
         ]
         let groupOptions = this.state.groups.map(function (group) {
             return { value: group.groupid, label: group.name };
@@ -180,7 +185,7 @@ export class RecentActivity extends Component {
                 }
                 getAmount = Number(getAmount).toFixed(2);
                 if (Number(group.settleFlag) > 0) {
-                    groupDivision = <p style={{ fontSize: "20px" }}><b>"{group.username}"</b> and <b>"{group.settlename}"</b> settled up in <b>"{group.name}"</b></p>
+                    groupDivision = <p style={{ fontSize: "20px" }}><b>"{group.username}"</b> and <b>"{group.settlename}"</b> settled up in <b>"{group.name}".</b></p>
                     groupPayingDivision = <div style={{ 'color': '#20BF9F', fontSize: "18px" }}><b> {group.currency} dues cleared  </b></div>
 
                 }
@@ -220,6 +225,8 @@ export class RecentActivity extends Component {
         }
         return (
             <div className="row">
+                            {redirectTo}
+
                 <div className="col-3 p-1 m-3">
                     <Select
                         style={{ width: "300px", marginLeft: "-30px" }}

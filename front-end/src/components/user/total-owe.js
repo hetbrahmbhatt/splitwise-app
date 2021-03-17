@@ -3,7 +3,8 @@ import cookie from "react-cookies";
 import profilePhoto from '../../images/profile-icon.png'
 import axios from 'axios';
 import BACKEND_URL from '../../config/config'
-
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from 'react-toastify';
 
 export class TotalOwe extends Component {
     constructor(props) {
@@ -24,14 +25,14 @@ export class TotalOwe extends Component {
         e.preventDefault();
         axios.post(BACKEND_URL + "/expense/owingsettleup", this.state).then(response => {
             if(response){
-                
+                toast.success("You are all settled up.Please reload the page to update the status.");
+
             }
             else{
 
             }
         });
 
-        console.log(this.state);
     }
     render() {
         return (
@@ -62,6 +63,7 @@ export class TotalOwe extends Component {
                         <button type="submit" style={{ backgroundColor: "#20BF9F" }} class="btn btn-primary btn-sm" onSubmit={this.handleSubmit}>Settle-Up</button>
                     </div>
                 </div>
+                <ToastContainer />
 
             </form>
 

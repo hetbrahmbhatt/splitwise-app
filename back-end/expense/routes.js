@@ -48,7 +48,14 @@ router.get('/totalbalance/:id', (req, res) => {
             for (let i = 0; i < results.length; i++) {
                 result.push(results[i].groupBalance)
             }
-            res.status(200).send(JSON.stringify(result.join(",")));
+            console.log(result);
+            if (result.length == 2 && result[1]== null) {
+                res.status(200).send(JSON.stringify(result));
+
+            }
+            else {
+                res.status(200).send(JSON.stringify(result.join(",")));
+            }
         }
     });
 });
@@ -72,10 +79,10 @@ router.get('/totalinternaldebt/:id', (req, res) => {
     var groupID = req.params.id;
     var sql = `select u.name as lendername,u2.name as lendeename,d.amount,d.currency from debt as d inner join users as u on d.userid1 = u.userid inner join users as u2 on d.userid2 = u2.userid where ref_groupid = ${groupID} and d.amount!=0;`;
     connection.query(sql, (err, results) => {
-        if(err){
+        if (err) {
 
         }
-        else{
+        else {
             res.status(200).send(JSON.stringify(results))
         }
     });
@@ -137,14 +144,14 @@ router.post('/owingsettleup', (req, res) => {
         }
         else {
             var sql = `insert into master_expense(ref_groupid,ref_paidby,settleFlag,currency,createdat) values(?,?,?,?,?);`
-            var values = [req.body.ref_groupid, userid1, userid2, req.body.tamount,timestamp];
+            var values = [req.body.ref_groupid, userid1, userid2, req.body.tamount, timestamp];
             connection.query(sql, values, (err, results) => {
                 if (err) {
                     console.log(err);
                 }
                 else {
                     var sql = `insert into recent_activity(ref_expenseid,ref_userid,ref_groupid,createdat) values(?,?,?,?);`
-                    var values = [results.insertId, sessionID, req.body.ref_groupid,timestamp];
+                    var values = [results.insertId, sessionID, req.body.ref_groupid, timestamp];
                     connection.query(sql, values, (err, results) => {
                         if (err) {
                             console.log(err);
@@ -214,14 +221,14 @@ router.post('/givingsettleup', (req, res) => {
         }
         else {
             var sql = `insert into master_expense(ref_groupid,ref_paidby,settleFlag,currency,createdat) values(?,?,?,?,?);`
-            var values = [req.body.ref_groupid, userid1, userid2, req.body.tamount,timestamp];
+            var values = [req.body.ref_groupid, userid1, userid2, req.body.tamount, timestamp];
             connection.query(sql, values, (err, results) => {
                 if (err) {
                     console.log(err);
                 }
                 else {
                     var sql = `insert into recent_activity(ref_expenseid,ref_userid,ref_groupid,createdat) values(?,?,?,?);`
-                    var values = [results.insertId, sessionID, req.body.ref_groupid,timestamp];
+                    var values = [results.insertId, sessionID, req.body.ref_groupid, timestamp];
                     connection.query(sql, values, (err, results) => {
                         if (err) {
                             console.log(err);

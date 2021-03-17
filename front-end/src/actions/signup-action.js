@@ -1,7 +1,6 @@
 import axios from 'axios';
 import BACKEND_URL from '../config/config'
 import cookie from "react-cookies";
-
 const SIGNUP_SUCCESS = "signup_success";
 const SIGNUP_FAILED = "signup_failed";
 

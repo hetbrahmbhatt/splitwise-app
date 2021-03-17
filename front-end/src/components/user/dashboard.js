@@ -92,6 +92,10 @@ export class DashBoard extends Component {
 
     }
     render() {
+        let redirectTo = null;
+        if (!(cookie.load("auth"))) {
+            redirectTo = <Redirect to="/" />
+        }
         let totalOwe = null;
         let totalGiving = null;
         console.log(this.state)
@@ -136,6 +140,7 @@ export class DashBoard extends Component {
         console.log(this.state);
         return (
             <div>
+                {redirectTo}
                 <div className="row">
                     <div className="col-1">
                     </div>
@@ -147,7 +152,7 @@ export class DashBoard extends Component {
                         </div>
                         <div style={{ backgroundColor: "whitesmoke", height: "100px", borderTop: "0.6px solid lightgrey" }}>
                             <div className="row">
-                                <div col-2 style={{ marginLeft: "70px", height: "90px", marginTop: "5px", width: "26%", marginRight: "60px", paddingRight: "60px", borderRight: "1px solid lightgrey" }}><h5>total</h5><p style={{ color: "#20BF9F", fontSize: "18px", marginLeft: "-40px" }}><div style={{ maxWidth: "100px" }}><strong>{this.state.totalBalance}</strong></div></p></div>
+                                <div col-2 style={{ marginLeft: "70px", height: "90px", marginTop: "5px", width: "26%", marginRight: "60px", paddingRight: "60px", borderRight: "1px solid lightgrey" }}><h5>total</h5><p style={{ color: "#20BF9F", fontSize: "18px", marginLeft: "-40px" }}><strong>{this.state.totalBalance}</strong></p></div>
                                 <div col-2 style={{ marginLeft: "10px", width: "33%", marginTop: "5px", marginRight: "60px", paddingRight: "90px", borderRight: "1px solid lightgrey" }}><center><h5>you owe</h5><p style={{ color: "#20BF9F", fontSize: "18px", marginLeft: "0px" }}><strong>{this.state.totalPositiveBalance}</strong></p></center></div>
                                 <div col-2 style={{ marginLeft: "10px", marginTop: "5px", maxWidth: "120px", marginRight: "60px", paddingRight: "2px" }}><h5>you are owed</h5><p style={{ color: "red", fontSize: "18px", marginLeft: "0px", color: "#FF8C00" }}><strong>{this.state.totalNegativeBalance}</strong></p>
                                 </div>

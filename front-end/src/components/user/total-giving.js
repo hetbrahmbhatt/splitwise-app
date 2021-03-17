@@ -3,7 +3,8 @@ import cookie from "react-cookies";
 import profilePhoto from '../../images/profile-icon.png'
 import axios from 'axios';
 import BACKEND_URL from '../../config/config'
-
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from 'react-toastify';
 export class TotalGiving extends Component {
     constructor(props) {
         super(props)
@@ -24,6 +25,7 @@ export class TotalGiving extends Component {
         e.preventDefault();
         axios.post(BACKEND_URL + "/expense/givingsettleup", this.state).then(response => {
             if (response) {
+                toast.success("You are all settled up.Please reload the page to update the status.");
 
             }
             else {
@@ -59,6 +61,7 @@ export class TotalGiving extends Component {
                     </div>
                     <div className="row" style={{ marginLeft: "200px", marginTop: "30px" }}>
                         <button type="submit" style={{ backgroundColor: "#FF8C00" }} class="btn btn-primary btn-sm" onSubmit={this.handleSubmit}>Settle-Up</button>
+                        <ToastContainer />
 
                     </div>
                 </div>
