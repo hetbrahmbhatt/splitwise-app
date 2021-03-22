@@ -4,7 +4,7 @@ This a prototype of splitwise.com built using MySQL, React.js, Express.js and No
 Getting Started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-Prerequisites
+#Prerequisites
 You will need Node.js installed on your machine.
 
 To install Node.js on Mac:
@@ -14,10 +14,10 @@ To install Node.js on Linux:
 
 brew install nodejs
 Installing
-Clone the contents of the Git repository to your local:
+#Clone the contents of the Git repository to your local:
 
 git clone https://github.com/hetbrahmbhatt/splitwise-app.git
-Go into the client directory(frontend) and run the following command:
+#Go into the client directory(frontend) and run the following command:
 
 npm install
 Go into the server directory(backend) and run the following command:
